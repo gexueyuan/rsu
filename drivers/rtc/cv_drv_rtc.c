@@ -9,28 +9,30 @@
            2015-12-15    gexueyuan    Created file
            ...
 ******************************************************************************/
-
+#if 1
 #include <time.h>
-
-#include "nmea.h"
-//#include "cv_osal.h"
-
-static void get_gps_time(t_time* gps_time)
+#include <sys/time.h>
+//#include "nmea.h"
+#include "cv_osal.h"
+#include <string.h>
+#include <stdio.h>
+static void get_gps_time(time_t *gps_time)
 {
 
     struct timeval tv;
 
     struct tm tm_sys;
 
-    memset(&tv,0,sizeof(timeval));
-    memset(&tm_sys,0,sizeof(tm));
+    memset(&tv,0,sizeof(struct timeval));
+    memset(&tm_sys,0,sizeof(struct tm));
 
-    
+    tm_sys.tm_year = gps_time-> 
 
 
 
 
 }
+#endif
 #if 0
 /*
  * Does the rtc_time represent a valid date/time?

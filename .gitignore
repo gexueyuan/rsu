@@ -85,6 +85,6 @@ prj_si/
 \project_keil\build
 rsu
 cli_agent
-drivers/rtc/dependence
+dependence
 drivers/vnet/wifi/dependence
 images/rsu

@@ -1,4 +1,4 @@
-TOOLCHAIN_PATH=/home/test/bin/gcc-4.6.2-glibc-2.13-linaro-multilib-2011.12/fsl-linaro-toolchain/bin/
+TOOLCHAIN_PATH=/home/gexueyuan/bin/gcc-4.6.2-glibc-2.13-linaro-multilib-2011.12/fsl-linaro-toolchain/bin/
 CROSS_COMPILE=$(TOOLCHAIN_PATH)arm-linux-
 
 AS      = $(CROSS_COMPILE)as
