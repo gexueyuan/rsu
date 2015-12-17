@@ -83,3 +83,8 @@ prj_si/
 /bin
 \library\STM32F4xx_Libraries\STM32F4xx_StdPeriph_Driver\prj_lib\keil
 \project_keil\build
+rsu
+cli_agent
+drivers/rtc/dependence
+drivers/vnet/wifi/dependence
+images/rsu
