@@ -10,8 +10,7 @@
            ...
 ******************************************************************************/
 
-#include <sys/time.h>
-
+#include <time.h>
 
 #include "nmea.h"
 //#include "cv_osal.h"
