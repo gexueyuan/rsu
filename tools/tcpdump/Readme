@@ -1,0 +1,9 @@
+tcpdump need libpcap:
+libpcap.so -> libpcap.so.1.7.4
+libpcap.so.1 -> libpcap.so.1.7.4
+libpcap.so.1.7.4
+
+1. cp libpcap.so.1.7.4 /usr/lib/
+2. cd /usr/lib
+3. ln -s libpcap.so.1.7.4 libpcap.so
+   ln -s libpcap.so.1.7.4 libpcap.so.1

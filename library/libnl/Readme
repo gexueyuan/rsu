@@ -1,0 +1,23 @@
+/usr/lib
+
+libnl-3.so -> libnl-3.so.200.20.0
+libnl-3.so.200 -> libnl-3.so.200.20.0
+libnl-3.so.200.20.0
+
+libnl-genl-3.so -> libnl-genl-3.so.200.20.0
+libnl-genl-3.so.200 -> libnl-genl-3.so.200.20.0
+libnl-genl-3.so.200.20.0
+
+
+
+hostapd: 
+  DRV_LIBS += -lnl-3
+  DRV_LIBS += -lnl-genl-3
+  DRV_CFLAGS += -DCONFIG_LIBNL20 -I/PATH/install/include/libnl3
+
+.config
+LIBS += -L/home/myzr/vanet/install/lib
+LIBNL_INC = /home/myzr/vanet/install/include/libnl3/
+
+CFLAGS += -I/home/myzr/vanet/install/opensslopenssl/include
+LIBS += -L/home/myzr/vanet/install/opensslopenssl/lib
