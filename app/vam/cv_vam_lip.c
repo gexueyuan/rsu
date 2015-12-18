@@ -11,7 +11,7 @@
 
 #define PI 3.1415926f
 #define RAD(d) ((d)*PI/180.0f)
-
+extern void gps_to_rtc(t_time * gps_time);
 void lip_gps_proc(vam_envar_t *p_vam, uint8_t *databuf, uint32_t len)
 {
 
@@ -113,6 +113,7 @@ void lip_update_local(t_nmea_rmc *p_rmc, float *p_accu)
             OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_INFO, "UTC: %d-%d-%d %d:%d:%d.%d\r\n",\
                     p_rmc->tt.year, p_rmc->tt.mon, p_rmc->tt.day, p_rmc->tt.hour, p_rmc->tt.min,\
                     p_rmc->tt.sec, p_rmc->tt.diffsec);
+            gps_to_rtc(&p_rmc->tt);
             if (p_vam->evt_handler[VAM_EVT_GPS_STATUS]){
                 (p_vam->evt_handler[VAM_EVT_GPS_STATUS])((void *)1);
             }
