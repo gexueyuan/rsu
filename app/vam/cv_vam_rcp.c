@@ -32,6 +32,8 @@ itis_codes_t itiscode[RSA_TYPE_MAX+1] =
 };
 
 float rcp_dbg_distance = 0;
+list_head_t test_comm_list;
+
 
 /*****************************************************************************
  * implementation of functions                                               *
@@ -703,6 +705,60 @@ wnet_txbuf_t *rcp_create_forward_msg(uint8_t left_hops, uint8_t *pdata, uint32_t
 //////////////////////////////////////////////////////////////
 //all below just for test
 //////////////////////////////////////////////////////////////
+void init_test_list(void)
+{
+    INIT_LIST_HEAD(&test_comm_list);
+
+}
+
+test_comm_node_t *test_find_sta(uint8_t *temporary_id)
+{
+    test_comm_node_t *p_sta = NULL, *pos;
+
+	list_for_each_entry(pos, test_comm_node_t, &test_comm_list, list){
+        if (memcmp(pos->pid, temporary_id, RCP_TEMP_ID_LEN) == 0){
+            p_sta = pos;
+            break;
+        }
+	}
+
+    /* not found, allocate new one */
+    if (p_sta == NULL){
+        p_sta = (test_comm_node_t*)malloc(sizeof(test_comm_node_t));
+        if(p_sta != NULL){
+            memset(p_sta,0,sizeof(test_comm_node_t));
+            memcpy(p_sta->pid,temporary_id,RCP_TEMP_ID_LEN);
+        }
+        else{
+            osal_printf("malloc error!");       
+        }        
+    }
+
+    return p_sta;
+}
+
+void empty_test_list(void)
+{
+    test_comm_node_t *pos = NULL;
+
+	list_for_each_entry(pos, test_comm_node_t, &test_comm_list, list){
+        list_del(&pos->list);
+        osal_free(pos);
+	}
+}
+
+void printf_stats(void)
+{
+
+    test_comm_node_t *pos;
+
+	list_for_each_entry(pos, test_comm_node_t, &test_comm_list, list){
+        osal_printf("\r\n[RX]Act=%d Ratio=%d%% dis=%d\r\n\r\n",pos->rx_cnt,pos->rx_cnt,(int)pos->distance_dev);
+	}
+
+
+
+}
 
 void timer_send_rsa_callback(void* parameter)
 {

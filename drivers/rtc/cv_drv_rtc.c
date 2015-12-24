@@ -141,7 +141,7 @@ static void gps_to_tm(t_time *gps_time,struct tm *tm_sys)
     tm_sys->tm_year = gps_time->year - 1900;
     tm_sys->tm_mon = gps_time->mon - 1;
     tm_sys->tm_mday = gps_time->day;
-    tm_sys->tm_hour = gps_time->hour;
+    tm_sys->tm_hour = gps_time->hour+8;
     tm_sys->tm_min = gps_time->min;
     tm_sys->tm_sec = gps_time->sec;
 

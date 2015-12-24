@@ -41,6 +41,7 @@ extern void timer_neigh_time_callback(void* parameter);
 extern void timer_gps_life_callback(void* parameter);
 
 extern uint8_t des(int offset);
+extern void init_test_list(void);
 
 vam_envar_t *p_vam_envar;
 
@@ -216,6 +217,7 @@ void vam_init(void)
         list_add_tail(&p_vam->remote[i].list, &p_vam->sta_free_list);
     }
     
+    init_test_list();
      /* os object for vam */
     p_vam->queue_vam = osal_queue_create("q-vam", VAM_QUEUE_SIZE, VAM_MQ_MSG_SIZE);
     osal_assert(p_vam->queue_vam != NULL);

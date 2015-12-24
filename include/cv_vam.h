@@ -146,6 +146,17 @@ typedef struct _vam_sta_node{
     /* os related */
 }vam_sta_node_t;
 
+typedef struct _test_comm_node{
+    /* !!!DON'T modify it!!! */
+    list_head_t list;
+
+    uint8_t pid[RCP_TEMP_ID_LEN];  //temporary ID
+
+    /* private */
+    uint32_t rx_cnt;
+    float    distance_dev;
+    /* os related */
+}test_comm_node_t;
 
 typedef struct _vam_config{
 
