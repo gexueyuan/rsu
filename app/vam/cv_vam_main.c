@@ -208,7 +208,7 @@ void vam_init(void)
     else {
         memcpy(p_vam->local.pid, p_cms_param->pid, RCP_TEMP_ID_LEN);
     }
-    OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_INFO, "PID: %02x %02x %02x %02x\r\n", \
+    OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_WARN, "PID: %02x %02x %02x %02x\r\n", \
         p_vam->local.pid[0], p_vam->local.pid[1], p_vam->local.pid[2], p_vam->local.pid[3]);
 
     INIT_LIST_HEAD(&p_vam->neighbour_list);

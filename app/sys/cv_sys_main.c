@@ -45,6 +45,7 @@ extern void mda_init(void);
 cms_global_t cms_envar, *p_cms_envar;
 
 extern void cv_oam_init();
+extern int drv_wifi_get_macaddr(uint8_t * mac);
 
 static uint8_t device_eletronic_signature[12];
 
@@ -53,10 +54,14 @@ void des_init(void)
     #define DES_BASE 0x1FFF7A10
 
     volatile uint32_t *des_reg = (uint32_t *)DES_BASE;
-
-    memcpy(&device_eletronic_signature[0], (void *)des_reg, 4);
-    memcpy(&device_eletronic_signature[4], (void *)(des_reg+1), 4);
-    memcpy(&device_eletronic_signature[8], (void *)(des_reg+2), 4);
+    
+    volatile uint8_t mac[MACADDR_LENGTH];;// 
+    
+    drv_wifi_get_macaddr(mac);
+    
+    memcpy(&device_eletronic_signature[0], (void *)mac, 4);
+    memcpy(&device_eletronic_signature[4], (void *)(mac+4), 4);
+    memcpy(&device_eletronic_signature[8], (void *)(mac+8), 4);
 }
 
 uint8_t des(int offset)

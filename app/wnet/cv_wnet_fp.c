@@ -22,7 +22,8 @@
 
 extern wnet_envar_t *p_wnet_envar;
 extern float rcp_dbg_distance;
-
+extern void empty_test_list(void);
+extern void printf_stats(void);
 /*****************************************************************************
  * declaration of variables and functions                                    *
 *****************************************************************************/
@@ -46,6 +47,8 @@ void test_comm(void)
 
         wnet_dbg_cacul_cnt = 0;
         wnet_dbg_rx_actual = 0;
+        printf_stats();
+        empty_test_list();
     }
 		
     if (wnet_dbg_rx_fresh > 0) {
