@@ -39,6 +39,28 @@ void cv_oam_vam_cfg_set_byte_reverse(uint8_t*data, uint32_t size, uint8_t type)
     cfg->cfg.bsm_boardcast_period = cv_short_byte_reverse(cfg->cfg.bsm_boardcast_period, type);
 }
 
+void cv_oam_vam_bsm_trigger_byte_reverse(uint8_t*data, uint32_t size, uint8_t type)
+{
+    uint8_t  *trigger = data;
+
+    if(data == NULL){
+        return;
+    }
+
+    *trigger = cv_int_byte_reverse(*trigger, type);
+}
+
+void cv_oam_vam_set_print_byte_reverse(uint8_t*data, uint32_t size, uint8_t type)
+{
+    int  *print_type = (int*) data;
+
+    if(data == NULL){
+        return;
+    }
+
+    *print_type = cv_int_byte_reverse(*print_type, type);
+}
+
 cv_sdk_data_order_func_t  g_sdk_xlat_table[CV_SDK_REQ_TYPE_END+1] =
 {
    #undef xx

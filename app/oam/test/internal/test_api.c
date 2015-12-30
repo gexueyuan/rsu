@@ -36,3 +36,21 @@ oam_status cv_oam_vam_cfg_get(vam_config_t *cfg)
     return 0;
 }
 
+oam_status cv_oam_vam_bsm_trigger(uint8_t trigger)
+{
+    if(trigger){
+        vam_start();
+    }
+    else{
+        
+        vam_stop();
+    }
+    return 0;
+}
+
+oam_status cv_oam_vam_set_print(int type)
+{
+    vam_set_print(type);
+    return 0;
+}
+

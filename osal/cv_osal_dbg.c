@@ -114,7 +114,7 @@ const debug_entry_t debug_entry_table_end = {NULL, NULL};
  */
 
 /* BEGIN: Added by wanglei, 2015/5/12 */
-int g_dbg_print_type = 1;
+int g_dbg_print_type = 0;
 /* END:   Added by wanglei, 2015/5/12 */
 
 

@@ -377,7 +377,7 @@ int rcp_parse_bsm(vam_envar_t *p_vam,
             test_node = test_find_sta(p_sta->s.pid);
             test_node->distance_dev = rcp_dbg_distance;
             test_node->rx_cnt++;
-            osal_printf("cnt is %d\n",test_node->rx_cnt);
+            //osal_printf("cnt is %d\n",test_node->rx_cnt);
         }
 
         if (p_vam->evt_handler[VAM_EVT_PEER_UPDATE]){
@@ -552,7 +552,7 @@ int rcp_send_bsm(vam_envar_t *p_vam)
     if (txbuf == NULL) {
         return -1;
     }
-    osal_printf("sizeof(bsm) = %d", sizeof(rcp_msg_basic_safty_t));
+    //osal_printf("sizeof(bsm) = %d", sizeof(rcp_msg_basic_safty_t));
 
     vam_get_local_current_status(&current);
     p_local = &current;

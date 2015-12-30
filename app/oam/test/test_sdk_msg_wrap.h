@@ -33,7 +33,6 @@ typedef struct{
     vam_config_t cfg;
 }__attribute__((packed)) cv_vam_cfg_set_msg_wrap_t;
 
-
 #ifdef __cplusplus
 #if __cplusplus
 }

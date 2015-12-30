@@ -75,3 +75,28 @@ oam_status cv_oam_vam_cfg_set(uint32_t mask, vam_config_t * cfg)
     return OAM_E_OK;
 }
 
+oam_status cv_oam_vam_bsm_trigger(uint8_t trigger)
+{
+    cv_sdk_msg_t pMsg;
+    oam_status result = OAM_E_ERROR;
+    memset(&pMsg,0,sizeof(cv_sdk_msg_t));
+
+    pMsg.len = sizeof(uint8_t);
+    pMsg.sdk_id = CV_SDK_VAM_BSM_TRIGGER;
+    pMsg.data[0] = trigger;
+    
+    result = (oam_status)  cv_oam_sdk_api_request(&pMsg);
+    
+    if(result != OAM_E_OK){
+        return result;
+    }
+
+    return OAM_E_OK;
+}
+
+
+oam_status cv_oam_vam_set_print(int type)
+{
+
+
+}

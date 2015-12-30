@@ -21,7 +21,7 @@
  * declaration of variables and functions                                    *
 *****************************************************************************/
 
-#define RSU_TEST
+//#define RSU_TEST
 
 /**
     prority of all the tasks in system 

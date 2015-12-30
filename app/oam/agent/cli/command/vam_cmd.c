@@ -126,10 +126,47 @@ DEFUN
 }
 
 
+
+
+DEFUN
+(
+    bsm_trigger_info,
+    bsm_trigger_cmd,
+    "bsm (stop|start)",
+    "bsm start\n∆Ù∂Ø∑¢ÀÕbsm\n"
+    "bsm stop\nÕ£÷π∑¢ÀÕbsm\n",
+    CMD_LEVEL_MONITOR_10
+)
+{
+    int ret = 0;
+
+    if(0 == strcmp(argv[0],"start")){
+
+       ret = cv_oam_vam_bsm_trigger(1);
+    }
+    else if((0 == strcmp(argv[0],"stop"))){
+
+       ret = cv_oam_vam_bsm_trigger(0);
+
+    }
+    else{
+
+        return CMD_WARNING;
+    }
+
+    if (ret != OAM_OK) {
+        VTY_SET_UNSUCCESSFULLY(vty);
+        return CMD_WARNING;
+
+    }
+    return CMD_SUCCESS;
+}
+
 void install_vam_manage_cmd()
 {
     install_element(ENABLE_NODE, &show_config_cmd);
-    install_element(ENABLE_NODE, &set_config_cmd);
+    install_element(ENABLE_NODE, &set_config_cmd);    
+    install_element(ENABLE_NODE, &bsm_trigger_cmd);
     return;
 }
 

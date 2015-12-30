@@ -83,7 +83,9 @@ extern int cv_drv_wifi_init( );
 void timer_stat_callback(void* parameter)
 {
     wnet_envar_t *p_wnet = p_wnet_envar;
-    test_comm();
+    if (0x1 & g_dbg_print_type){
+        test_comm();
+    }
 }
 
 void wnet_init(void)
