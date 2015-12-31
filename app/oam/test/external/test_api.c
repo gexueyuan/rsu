@@ -95,8 +95,23 @@ oam_status cv_oam_vam_bsm_trigger(uint8_t trigger)
 }
 
 
-oam_status cv_oam_vam_set_print(int type)
+oam_status cv_oam_vam_set_print(uint8_t type)
 {
 
+    cv_sdk_msg_t pMsg;
+    oam_status result = OAM_E_ERROR;
+    memset(&pMsg,0,sizeof(cv_sdk_msg_t));
+
+    pMsg.len = sizeof(uint8_t);
+    pMsg.sdk_id = CV_SDK_VAM_SET_PRINT;
+    pMsg.data[0] = type;
+    
+    result = (oam_status)  cv_oam_sdk_api_request(&pMsg);
+    
+    if(result != OAM_E_OK){
+        return result;
+    }
+
+    return OAM_E_OK;
 
 }

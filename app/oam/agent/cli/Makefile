@@ -34,6 +34,7 @@ app:
 
 install:
 	cp -f $(TARGET) $(IMAGES_DIR)/
+	cp -f $(TARGET) $(TFTP_DIR)/
 
 clean:
 	-rm -rf $(TARGET)
