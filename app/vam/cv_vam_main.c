@@ -202,7 +202,7 @@ void vam_init(void)
    
     if (0 == memcmp(p_cms_param->pid, zero_pid, RCP_TEMP_ID_LEN)){
         for (i=0; i<RCP_TEMP_ID_LEN; i++){
-            p_vam->local.pid[i] = 0xbb;//des(RCP_TEMP_ID_LEN-1-i);
+            p_vam->local.pid[i] = 0xaa;//des(RCP_TEMP_ID_LEN-1-i);
         }
     }
     else {
