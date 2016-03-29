@@ -164,7 +164,7 @@ void *cv_oam_rx_thread(void *arg)
         len = recv(sockfd, buf, CV_OAM_PKT_MAX_LEN, 0);
         
         if(len <= 0 && errno != EINTR){
-            OAM_LOG("peer socket is break down\n");
+            //OAM_LOG("peer socket is break down\n");/*cancel print info --20160126*/
             cv_oam_server_free_client(sockfd);
             close(sockfd);
             return;

@@ -63,6 +63,22 @@ static void ubx_cfg_msg_std_nmea(int fd, ubx_cfg_msg_nmea_id_t nmea_id, uint8_t 
     os_device_write(fd, buf, len);    
 }
 
+static void ubx_cfg_sbas(int fd,uint8_t enable)
+{
+   /* set baut rate = 115200 */
+    uint8_t cfg_sbas[] = {
+        0xB5, 0x62, 0x06, 0x16, 0x08, 0x00,0x00, 0x01, 0x03, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0xAA, 0xBB
+    };
+    cfg_sbas[6] = enable;
+    printf("buffer is %d\n",sizeof(cfg_sbas));
+    ubx_pkt_checknum_calc(&cfg_sbas[2],sizeof(cfg_sbas)-4,&cfg_sbas[sizeof(cfg_sbas)-2],&cfg_sbas[sizeof(cfg_sbas)-1]);
+    int i = 0;
+    for(;i < sizeof(cfg_sbas);i++)
+        printf("cfg_sbas[%d] is 0x%X\n",i,cfg_sbas[i]);
+    
+    os_device_write(fd, cfg_sbas, sizeof(cfg_sbas));    
+}
 
 /* UBX-CFG MSG. disable GPGGA/GPGLL/GPGSV/GPVTG msg */
 static void ubx_cfg_needed_nmea(int fd)
@@ -140,6 +156,8 @@ void gps_chip_config(int fd, int freq)
 {
     /* get gps nmea. config needed nmea */
     ubx_cfg_needed_nmea(fd);
+    //osal_sleep(10);	
+    //ubx_cfg_sbas(fd,0);
     osal_sleep(10);	
 #if 0
     /* conifg ublox gps rate 5Hz */

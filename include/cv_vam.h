@@ -29,6 +29,7 @@
 #define RCP_MSG_ID_BSM   DSRCmsgID_basicSafetyMessage
 #define RCP_MSG_ID_EVAM  DSRCmsgID_emergencyVehicleAlert
 #define RCP_MSG_ID_RSA   DSRCmsgID_roadSideAlert
+#define RCP_MSG_ID_RTCM  DSRCmsgID_rtcmCorrections
 
 
 #define BSM_BC_MODE_DISABLE 0

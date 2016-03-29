@@ -201,9 +201,10 @@ int get_cli_user_info(char *user_name, char *user_pwd, int *pri, int *online, in
     int i;
 
     user_sem_lock();
-    
+    printf("your name is %s\n",user_name);
     for (i=0; i<MAX_CLI_USER; ++i)
     {
+        printf("store name is %s\n",g_astUserArr[i].szName);
         if (0 == strcmp(g_astUserArr[i].szName, user_name))
         {
             *pri = g_astUserArr[i].iPriority;
@@ -211,6 +212,7 @@ int get_cli_user_info(char *user_name, char *user_pwd, int *pri, int *online, in
             *terminal_type = g_astUserArr[i].iTerminalType;
             memcpy(user_pwd, g_astUserArr[i].szPwd, MAX_PASSWD_LEN);
             user_sem_unlock();
+            printf("password is %s\n",user_pwd);
             return 0;
         }
     }
@@ -278,7 +280,7 @@ __attribute((constructor)) void _user_init(void)
     return;
 }
 
-__attribute ((destructor)) void _user_fini(void)
+__attribute ((destructor)) void _user_fini(void)/*程序退出时调用*/
 {
     user_sem_lock();
     if (NULL != g_pstUserMem)

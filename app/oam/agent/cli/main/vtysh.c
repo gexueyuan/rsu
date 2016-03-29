@@ -406,6 +406,7 @@ static void shell_login(struct vty *pstVty)
         else
         {
             vty_out(vty, "Incorrect user name or password%s", VTY_NEWLINE);
+            //vty_out(vty,"username is %s,password is %s%s",szUserName,line_read,VTY_NEWLINE);
             continue;
         }
     }

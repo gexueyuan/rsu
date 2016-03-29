@@ -46,7 +46,7 @@ static int get_user_info(const char *pcName, char *pcPasswd, int *piPriority)
 /* 用户登陆认证 */
 int use_auth(char *pcUserName, char *pcPasswd, int *piPriority)
 {
-	int iErrCode;
+	int iErrCode = OSAL_ERROR;
 	char szPasswd[MAX_PASSWD_LEN+1] = {0};
 	
     if (NULL == pcUserName || NULL == pcPasswd)
@@ -137,7 +137,7 @@ void release_user(int iUserIndex, int iTerminal)
         g_astUserArr[iUserIndex].iTerminalType ^= iTerminal;
         if (0 == g_astUserArr[iUserIndex].iTerminalType)
         {
-            memset(&g_astUserArr[iUserIndex], 0, sizeof(strUserInfo));
+            //memset(&g_astUserArr[iUserIndex], 0, sizeof(strUserInfo));
         }
     }
     
