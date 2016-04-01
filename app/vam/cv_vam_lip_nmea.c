@@ -273,6 +273,7 @@ void nmea_parse(uint8_t *buff, uint32_t len)
     if (memcmp(buff, "$GPRMC", 6) == 0){
         CurPackType = GPS_PACK_GPRMC;
         printf("%s\n", buff);
+        fflush(stdout);
         //NMEA_DEBUG("NMEA->%s\n", buff);
     }
     else if (memcmp(buff, "$GPGSA", 6) == 0){

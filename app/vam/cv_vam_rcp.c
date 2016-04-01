@@ -715,6 +715,66 @@ int rcp_send_rsa(vam_envar_t *p_vam)
 }
 
 
+
+
+int rcp_send_rtcm(vam_envar_t *p_vam)
+{
+    int ret = 0;
+    rcp_msg_roadside_alert_t *p_rsa;
+    vam_stastatus_t *p_local = &p_vam->local;
+    
+    wnet_txbuf_t *txbuf;
+    wnet_txinfo_t *txinfo;
+
+    txbuf = wnet_get_txbuf();
+    
+    if (txbuf == NULL) {
+        osal_printf("get txbuf failed line%d", __LINE__);
+        return -1;
+    }
+
+    /* The RSU position is fixed */
+#if 0
+    vam_stastatus_t current;
+    vam_get_local_current_status(&current);
+    p_local = &current;
+#endif
+
+    p_rsa = (rcp_msg_roadside_alert_t *)WNET_TXBUF_DATA_PTR(txbuf);
+
+    p_rsa->msg_id.hops = p_vam->working_param.bsm_hops;
+    p_rsa->msg_id.id = RCP_MSG_ID_RSA;
+    p_rsa->msg_count = p_vam->tx_rsa_msg_cnt++;
+    vam_active_rsa(RSA_TYPE_CURVE);
+    p_rsa->typeEvent = encode_itiscode(p_local->alert_mask, p_rsa->description);
+
+#if 0
+    p_local->pos.lon = 132.327144*3.1415926/180.0;
+    p_local->pos.lat = 40.0*3.1415926/180.0;
+#endif
+    p_rsa->position.lon = encode_longtitude(p_local->pos.lon);
+    p_rsa->position.lat = encode_latitude(p_local->pos.lat);
+    p_rsa->position.elev = encode_elevation(p_local->pos.elev);
+    p_rsa->position.heading = encode_heading(p_local->dir);
+    p_rsa->position.speed.speed = encode_speed(p_local->speed);
+
+    txinfo = WNET_TXBUF_INFO_PTR(txbuf);
+    memset(txinfo, 0, sizeof(wnet_txinfo_t));
+    memcpy(txinfo->dest.dsmp.addr, "\xFF\xFF\xFF\xFF\xFF\xFF", MACADDR_LENGTH);
+    txinfo->dest.dsmp.aid = 0x00000020;
+    txinfo->protocol = WNET_TRANS_PROT_DSMP;
+    txinfo->encryption = WNET_TRANS_ENCRYPT_NONE;
+    txinfo->prority = WNET_TRANS_RRORITY_EMERGENCY;
+    txinfo->timestamp = osal_get_systemtime();
+
+    ret = wnet_send(txinfo, (uint8_t *)p_rsa, sizeof(rcp_msg_roadside_alert_t));
+    if (ret) {
+        osal_printf("wnet_send failed line%d", __LINE__);
+    }
+    return ret;
+}
+
+
 int rcp_send_forward_msg(wnet_txbuf_t *txbuf)
 {
     wnet_txinfo_t *txinfo;

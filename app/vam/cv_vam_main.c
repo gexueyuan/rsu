@@ -89,6 +89,9 @@ void vam_main_proc(vam_envar_t *p_vam, sys_msg_t *p_msg)
             if (p_msg->argc == RCP_MSG_ID_RSA){
                 rcp_send_rsa(p_vam);
             }
+            if (p_msg->argc == RCP_MSG_ID_RTCM){
+                rcp_send_rsa(p_vam);
+            }
 
             break;
 

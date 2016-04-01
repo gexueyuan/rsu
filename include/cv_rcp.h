@@ -331,7 +331,8 @@ typedef struct _msg_emergency_vehicle_alert{
     uint16_t  crc;
 }__COMPILE_PACK__ rcp_msg_emergency_vehicle_alert_t;
 
-
+/*MSG_RTCM_Corrections*/
+//typedef struct 
 
 #endif /* __CV_RCP_H__ */
 
