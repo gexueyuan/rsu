@@ -331,8 +331,57 @@ typedef struct _msg_emergency_vehicle_alert{
     uint16_t  crc;
 }__COMPILE_PACK__ rcp_msg_emergency_vehicle_alert_t;
 
-/*MSG_RTCM_Corrections*/
-//typedef struct 
+/* RTCM-Corrections */
+typedef long	 RTCM_Revision_t;
+
+typedef enum RTCM_Revision {
+	RTCM_Revision_unknown	= 0,
+	RTCM_Revision_reserved	= 1,
+	RTCM_Revision_rtcmCMR	= 2,
+	RTCM_Revision_rtcmCMR_Plus	= 3,
+	RTCM_Revision_rtcmSAPOS	= 4,
+	RTCM_Revision_rtcmSAPOS_Adv	= 5,
+	RTCM_Revision_rtcmRTCA	= 6,
+	RTCM_Revision_rtcmRAW	= 7,
+	RTCM_Revision_rtcmRINEX	= 8,
+	RTCM_Revision_rtcmSP3	= 9,
+	RTCM_Revision_rtcmBINEX	= 10,
+	RTCM_Revision_rtcmRev2_x	= 19,
+	RTCM_Revision_rtcmRev2_0	= 20,
+	RTCM_Revision_rtcmRev2_1	= 21,
+	RTCM_Revision_rtcmRev2_3	= 23,
+	RTCM_Revision_rtcmRev3_0	= 30,
+	RTCM_Revision_rtcmRev3_1	= 31
+	/*
+	 * Enumeration is extensible
+	 */
+} e_RTCM_Revision;
+
+/* RTCM-ID */
+typedef long	 RTCM_ID_t;
+
+typedef enum GPSstatus {
+        GPSstatus_unavailable   = 0,    
+        GPSstatus_isHealthy = 1,    
+        GPSstatus_isMonitored   = 2,    
+        GPSstatus_baseStationType   = 3,    
+        GPSstatus_aPDOPofUnder5 = 4,    
+        GPSstatus_inViewOfUnder5    = 5,    
+        GPSstatus_localCorrectionsPresent   = 6,    
+        GPSstatus_networkCorrectionsPresent = 7
+} e_GPSstatus;
+
+typedef struct _msg_RTCM_Corrections {
+	rcp_msgid_t	 msgID;
+	uint8_t	 msgCnt;
+	RTCM_Revision_t	 rev;
+    RTCM_ID_t   *rtcmID /* OPTIONAL */;
+    e_GPSstatus status;
+    int len;
+    uint8_t payload[1023];    
+
+}__COMPILE_PACK__ rcp_msg_RTCM_Corrections_t;
+
 
 #endif /* __CV_RCP_H__ */
 

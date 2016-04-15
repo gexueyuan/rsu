@@ -4,10 +4,10 @@
 #include "cv_cms_def.h"
 #include "nmea.h"
 #include "gps.h"
-
+#include "ntrip.h"
 uint8_t IsLocate = __FALSE;
 osal_mutex_t* p_mutex_gps;
-
+uint8_t Issend = __FALSE;
 
 #if 0
 #define Grav_accel_value (9.80665f)	    //Gravitational acceleration
@@ -272,14 +272,18 @@ void nmea_parse(uint8_t *buff, uint32_t len)
 
     if (memcmp(buff, "$GPRMC", 6) == 0){
         CurPackType = GPS_PACK_GPRMC;
-        printf("%s\n", buff);
-        fflush(stdout);
+        //printf("%s\n", buff);
+        //fflush(stdout);
         //NMEA_DEBUG("NMEA->%s\n", buff);
     }
     else if (memcmp(buff, "$GPGSA", 6) == 0){
         CurPackType = GPS_PACK_GPGSA;
 
         //NMEA_DEBUG("NMEA->%s\n", buff);
+    }
+    else if(memcmp(buff, "$GPGGA", 6) == 0){
+        CurPackType = GPS_PACK_GPGGA;
+        
     }
     else return;
     //if (len <= 50) return;
@@ -490,5 +494,22 @@ void nmea_parse(uint8_t *buff, uint32_t len)
         else {
             ;
         }
+    }
+    
+    else if (CurPackType == GPS_PACK_GPGGA) {
+
+
+        if((__TRUE == IsLocate)&&(__FALSE == Issend)){
+
+            send_gga(buff,IsLocate);
+            Issend = __TRUE;
+            fprintf(stdout,"send gga to ntrip\n");
+        }
+
+        if((__FALSE == IsLocate)&&(__TRUE == Issend)){
+
+            return;
+        }
+
     }
 }

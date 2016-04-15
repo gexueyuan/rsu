@@ -55,7 +55,7 @@
 #define WNET_QUEUE_SIZE 20
 
 /* per message len */
-#define QUEUE_MSG_SIZE 256
+#define QUEUE_MSG_SIZE 512
 #define VAM_MQ_MSG_SIZE 128
 #define VSA_MQ_MSG_SIZE 128
 #define SYS_MQ_MSG_SIZE 128

@@ -83,7 +83,7 @@ static void ubx_cfg_sbas(int fd,uint8_t enable)
 /* UBX-CFG MSG. disable GPGGA/GPGLL/GPGSV/GPVTG msg */
 static void ubx_cfg_needed_nmea(int fd)
 {
-    ubx_cfg_msg_std_nmea(fd, STD_NMEA_ID_GGA, 0);
+    //ubx_cfg_msg_std_nmea(fd, STD_NMEA_ID_GGA, 0);
     ubx_cfg_msg_std_nmea(fd, STD_NMEA_ID_GLL, 0);
     ubx_cfg_msg_std_nmea(fd, STD_NMEA_ID_GSV, 0);
     ubx_cfg_msg_std_nmea(fd, STD_NMEA_ID_VTG, 0);

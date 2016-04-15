@@ -47,6 +47,8 @@ cms_global_t cms_envar, *p_cms_envar;
 extern void cv_oam_init();
 extern int drv_wifi_get_macaddr(uint8_t * mac);
 
+extern void ntrip_init();
+
 static uint8_t device_eletronic_signature[12];
 
 void des_init(void)
@@ -91,7 +93,7 @@ int main(int argc, char *argv[])
     vam_start();
 //    vsa_start();
     gps_init();
-
+    ntrip_init();
     cv_oam_init();
     
     while (1){

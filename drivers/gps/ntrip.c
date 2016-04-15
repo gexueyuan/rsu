@@ -83,8 +83,6 @@ struct Args
   const char *serlogfile;
 };
 
-#define GPS_BUFF_SIZE 256
-#define GPS_PIPE 5
 
 #ifndef __TRUE
  #define __TRUE         1
@@ -93,33 +91,40 @@ struct Args
  #define __FALSE        0
 #endif
 
-int IsLocate = __FALSE;
-int Get_GGA = __FALSE;
 
-typedef enum{
-    GPS_PACK_UNKNOWN = 0,
-    GPS_PACK_GPGGA,
-    GPS_PACK_GPGSA,
-    GPS_PACK_GPGSV,
-    GPS_PACK_GPRMC,
-    GPS_PACK_GPVTG
-} e_nmea_type;
-
-typedef struct {
-	uint8_t Flag;
-	uint8_t Buf[GPS_BUFF_SIZE];
-	uint32_t Len;
-} t_buff;
-
-typedef struct {
-	uint8_t Pipe;
-	t_buff PpBuf[GPS_PIPE];
-}t_gps_buff;
-
-t_gps_buff __GPSBuff;
 char tmp;
 char gga_buff[GPS_BUFF_SIZE];
 
+osal_queue_t *queue_ntrip;
+ntrip_gga_t  ntrip_gga;
+
+
+extern int rcp_send_rtcm(uint8_t *buff,int len);
+    
+void send_gga(char * gga_string,uint8_t flag_locate)
+{
+    int err = 0;
+
+    ntrip_gga_t * p_ntrip_gga = &ntrip_gga;
+
+    p_ntrip_gga = (ntrip_gga_t*)osal_malloc(sizeof(ntrip_gga_t));
+
+    p_ntrip_gga->flag_locate = flag_locate;
+    //ntrip_gga->gga_buff = gga_string;
+    memcpy(p_ntrip_gga->gga_buff,gga_string,GPS_BUFF_SIZE);
+    printf("send gga is %s len is %d\n",p_ntrip_gga->gga_buff,sizeof(ntrip_gga_t *));    
+    err = osal_queue_send(queue_ntrip, &p_ntrip_gga, sizeof(ntrip_gga_t *), 0, OSAL_NO_WAIT);
+    
+    if (err != OSAL_STATUS_SUCCESS){
+        osal_printf("ntrip send error!\n");
+        if(p_ntrip_gga)
+            osal_free(p_ntrip_gga);
+    }
+
+    return err;
+
+
+}
 /* option parsing */
 #ifdef NO_LONG_OPTS
 #define LONG_OPT(a)
@@ -176,184 +181,6 @@ static void sighandler_alarm(int sig)
   sigstop = 1;
   alarm(2);
   stop = 1;
-}
-
-
-void nmea_parse(uint8_t *buff, uint32_t len)
-{
-    uint8_t crcCk = 0x00;
-    uint8_t crcCp = 0x00;
-    uint32_t index = 0;
-    float latitude = 0.0;
-    float longitude = 0.0;
-    float speed = 0.0;
-    float heading = 0.0;
-    float accu = 0.0;
-    char *pStrS = NULL;
-    char *pStrE = NULL;
-    e_nmea_type CurPackType = GPS_PACK_UNKNOWN;
-    int i;
-
-    if (memcmp(buff, "$GPRMC", 6) == 0){
-        CurPackType = GPS_PACK_GPRMC;
-    }
-    else if (memcmp(buff, "$GPGSA", 6) == 0){
-        CurPackType = GPS_PACK_GPGSA;
-    }
-    else if (memcmp(buff, "$GPGGA", 6) == 0){
-        CurPackType = GPS_PACK_GPGGA;
-    }
-    else return;
-    //if (len <= 50) return;
-
-    if (buff[len - 5] != '*') {
-        //fprintf(stderr,"NMEA->No *\n");
-        return;
-    }
-
-    //Check CRC
-    for (index = 1; index < len -5; index++) {
-        crcCk ^= buff[index];
-    }
-
-    //Convent
-    if (isdigit(buff[len - 4])) {
-        crcCp = (buff[len - 4] << 4) & 0xf0;
-    }
-    else if (isalpha(buff[len - 4])) {
-        crcCp = ((buff[len - 4] << 4) + 0x90 ) & 0xf0;
-    }
-    else {
-         fprintf(stderr,"NMEA->Error 0\n");
-        return;
-    }
-
-    if (isdigit(buff[len - 3])) {
-        crcCp |= (buff[len - 3] & 0x0f);
-    }
-    else if (isalpha(buff[len - 3])) {
-        crcCp |= ((buff[len - 3] + 0x09 ) & 0x0f);
-    }
-    else {
-         fprintf(stderr,"NMEA->Error 1\n");
-        return;
-    }
-
-    //Compare
-    if (crcCk != crcCp) {
-         fprintf(stderr,"NMEA->数据帧CRC校验错误\n");
-        return;
-    }
-
-    if (CurPackType == GPS_PACK_GPRMC){
-        if (IsLocate != __TRUE) {
-            //fprintf(stdout,"NMEA->定位精度不够\n");
-            return;
-        }
-
-        pStrS = (char *)buff;
-        if ((pStrS = strchr((char *)buff, ',')) != NULL) {
-            pStrS++;
-            if ((pStrS = strchr(pStrS, ',')) != NULL) {
-                pStrS++;
-            }
-            else return;
-        }
-        else return;
-
-        if ((*pStrS) == 'A') {
-            
-        }
-        else {
-             IsLocate = __FALSE;
-             //fprintf(stderr,"NMEA->未定位\n");
-        }
-    }
-    else if (CurPackType == GPS_PACK_GPGSA) {
-        uint8_t Tmp[16];
-        uint8_t i = 0;
-        uint8_t IsError = __FALSE;
-
-        //判断定位
-        for (pStrS = (char *)buff, i = 0; i < 2; i++) {
-            if ((pStrS = strchr(pStrS + 1, ',')) == NULL) {
-                IsError = __TRUE;
-                break;
-            }
-        }
-        if (IsError == __FALSE) {
-            pStrS++;
-            if (*(pStrS) == ',') {
-                IsLocate = __FALSE;
-                //NMEA_DEBUG("NMEA->未定位\n");
-                return;
-            }
-            if ((pStrE = strchr(pStrS, ',')) == NULL) return;
-            if (pStrE - pStrS > (sizeof(Tmp) - 1))  return;
-
-            memset(Tmp, 0, sizeof(Tmp));
-            memcpy(Tmp, pStrS, pStrE - pStrS);
-
-            //NMEA_DEBUG("NMEA->定位标志:%s\n", Tmp);
-
-            if (atoi((char *)Tmp) == 1) {
-                IsLocate = __FALSE;
-                //NMEA_DEBUG("NMEA->未定位\n");
-                return;
-            }
-        }
-        else {
-            return;
-        }
-        //判断定位精度
-        IsError = __FALSE;
-        for (pStrS = (char *)buff, i = 0; i < 15; i++) {
-            if ((pStrS = strchr(pStrS + 1, ',')) == NULL) {
-                IsError = __TRUE;
-                break;
-            }
-        }
-        if (IsError == __FALSE) {
-            pStrS++;
-            if (*(pStrS) == ',') {
-                IsLocate = __FALSE;
-                //NMEA_DEBUG("NMEA->定位精度不够\n");
-                return;
-            }
-            if ((pStrE = strchr(pStrS, ',')) == NULL) return;
-            if (pStrE - pStrS > (sizeof(Tmp) - 1))  return;
-
-            memset(Tmp, 0, sizeof(Tmp));
-            memcpy(Tmp, pStrS, pStrE - pStrS);
-
-            //NMEA_DEBUG("NMEA->定位精度:%s\n", Tmp);
-
-            accu = (float)atof((char *)Tmp);
-
-            if ( accu > 49.0f) {
-                IsLocate = __FALSE;
-                //NMEA_DEBUG("NMEA->定位精度不够\n");
-            }
-            else {
-                IsLocate = __TRUE;
-                //lip_update_local(NULL, &accu);
-                //NMEA_DEBUG("NMEA->有效定位精度\n");
-            }
-        }
-        else {
-            ;
-        }
-    }
-    if((CurPackType == GPS_PACK_GPGSA) && (IsLocate == __TRUE)){
-
-        for(i = 0;buff[i] != '\n';i++)
-            gga_buff[i] = buff[i];
-
-        gga_buff[i] = 0;
-        
-        Get_GGA = __TRUE;
-        fprintf(stdout,"GGA string is %s\n",gga_buff);
-    }
 }
 
 static const char *encodeurl(const char *req)
@@ -510,7 +337,7 @@ static const char *geturl(const char *url, struct Args *args)
   return *url ? "Garbage at end of server string." : 0;
 }
 
-static int getargs(struct Args *args)
+static int getargs(struct Args *args,char* gga_string)
 {
   int res = 1;
   int getoptr;
@@ -521,7 +348,9 @@ static int getargs(struct Args *args)
   args->port = "8001";
   args->user = "carsmart1";
   args->password = "6648ebb";
-  args->nmea = "$GPGGA,023056.00,3957.34315,N,11621.53262,E,1,10,1.07,155.5,M,-8.6,M,,*43";//0;
+  
+  args->nmea = gga_string;//"$GPGGA,023056.00,3957.34315,N,11621.53262,E,1,10,1.07,155.5,M,-8.6,M,,*43";//0;
+  
   args->data = "RTCM23_GPS";
   args->bitrate = 0;
   args->proxyhost = 0;
@@ -603,7 +432,7 @@ static int encode(char *buf, int size, const char *user, const char *pwd)
   return bytes;
 }
 
-int ntrip_main_proc()
+int ntrip_main_proc(ntrip_gga_t * p_msg)
 {
   struct Args args;
 
@@ -615,8 +444,8 @@ int ntrip_main_proc()
   
   alarm(ALARMTIME);
 
-
-  if(getargs(&args))
+    printf("recieve GGA is %s\n",p_msg->gga_buff);
+  if(getargs(&args,p_msg->gga_buff))
   {
     struct serial sx;
     FILE *ser = 0;
@@ -1468,8 +1297,8 @@ int ntrip_main_proc()
           if(!stop && !error)
           {
           
-          //printf("%s,%u\n",__FILE__,__LINE__);
-          //printf("send buf is %s",buf);
+          printf("%s,%u\n",__FILE__,__LINE__);
+          printf("send buf is %s",buf);
             if(send(sockfd, buf, (size_t)i, 0) != i)
             {
               myperror("send");
@@ -1492,7 +1321,8 @@ int ntrip_main_proc()
               (numbytes=recv(sockfd, buf, MAXDATASIZE-1, 0)) > 0)
               {
                 alarm(ALARMTIME);
-                //printf("%s,%u\n",__FILE__,__LINE__);
+                printf("%s,%u\n",__FILE__,__LINE__);
+                //printf("recive buf is %s",buf);
 
                 if(!k)
                 {
@@ -1624,9 +1454,12 @@ int ntrip_main_proc()
                       int ofs = 0;
                       while(numbytes > ofs && !stop)
                       {
-                        //printf("\n\nbuf is %s\n\n",buf);
-                        //printf("%s,%u\n",__FILE__,__LINE__);
-                        int i = numbytes-ofs;//SerialWrite(&sx, buf+ofs, numbytes-ofs);
+                        //printf("\n\nbuf-serial is %s\n len is %d\n",buf,numbytes-ofs);
+                        printf("%s,%u\n",__FILE__,__LINE__);
+                        //fflush(stdout);
+                        int i = rcp_send_rtcm(buf+ofs,numbytes-ofs);//SerialWrite(&sx, buf+ofs, numbytes-ofs);//numbytes-ofs;//
+                        
+                        //i = SerialWrite(&sx, buf+ofs, numbytes-ofs);
                         if(i < 0)
                         {
                           fprintf(stderr, "Could not access serial device\n");
@@ -1636,19 +1469,26 @@ int ntrip_main_proc()
                           ofs += i;
                       }
                     }
-                    else
+                    else{
+                        printf("write to stdout!\n");
                       fwrite(buf, (size_t)numbytes, 1, stdout);
+                        }
+                    printf("%s,%u\n",__FILE__,__LINE__);
                   }
                   fflush(stdout);
+                  printf("%s,%u\n",__FILE__,__LINE__);
                   if(totalbytes < 0) /* overflow */
                   {
                     totalbytes = 0;
                     starttime = time(0);
                     lastout = starttime;
                   }
+                  printf("%s,%u\n",__FILE__,__LINE__);
                   if(args.serdevice && !stop)
                   {
                     int doloop = 1;
+                    
+                    printf("%s,%u\n",__FILE__,__LINE__);
                     while(doloop && !stop)
                     {
                       int i = SerialRead(&sx, buf, 200);
@@ -1705,6 +1545,7 @@ int ntrip_main_proc()
                       }
                     }
                   }
+                  printf("%s,%u\n",__FILE__,__LINE__);
                   if(args.bitrate)
                   {
                     int t = time(0);
@@ -1716,13 +1557,13 @@ int ntrip_main_proc()
                     }
                   }
                 }
-                //printf("%s,%u\n",__FILE__,__LINE__);
+                printf("%s,%u\n",__FILE__,__LINE__);
               }
             }
             else
             {
             
-            //printf("%s,%u\n",__FILE__,__LINE__);
+            printf("%s,%u\n",__FILE__,__LINE__);
               sleeptime = 0;
               while(!stop && (numbytes=recv(sockfd, buf, MAXDATASIZE-1, 0)) > 0)
               {
@@ -1749,24 +1590,23 @@ int ntrip_main_proc()
 void * ntrip_thread_entry (void *parameter)
 {
     int err;
-    sys_msg_t *p_msg;
+    ntrip_gga_t * *p_msg;
     vam_envar_t *p_vam = (vam_envar_t *)parameter;
     uint32_t len = 0;
     uint8_t buf[VAM_MQ_MSG_SIZE];
     
     //OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_INFO, "%s: ---->\n", __FUNCTION__);
 
-    p_msg = (sys_msg_t *)buf;
+    //p_msg = (ntrip_gga_t *)buf;
     
 	while(1){
-        memset(buf, 0, VAM_MQ_MSG_SIZE);
-        err = osal_queue_recv(p_vam->queue_vam, buf, &len, OSAL_WAITING_FOREVER);
+        //memset(buf, 0, sizeof());
+        err = osal_queue_recv(queue_ntrip, &p_msg, &len, OSAL_WAITING_FOREVER);
         if (err == OSAL_STATUS_SUCCESS && len > 0){
-            ntrip_main_proc(p_vam, p_msg);
+            ntrip_main_proc(p_msg);
         }
         else{
-            OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_ERROR, "%s: osal_queue_recv error [%d]\n",\
-                            __FUNCTION__, err);
+            printf("receive ntrip msg error!\n");
         }
 	}
 }
@@ -1774,10 +1614,15 @@ void ntrip_init(void)
 {
     osal_task_t *tid;
 
+    queue_ntrip = osal_queue_create("q-ntrip", SYS_QUEUE_SIZE, QUEUE_MSG_SIZE);
+    osal_assert(queue_ntrip != NULL);
 
 	tid = osal_task_create("tk_ntrip",
                            ntrip_thread_entry, NULL,
                            RT_NTRIP_THREAD_STACK_SIZE, RT_NTRIP_THREAD_PRIORITY);
     osal_assert(tid != NULL)
+
+
+    
 }
 
