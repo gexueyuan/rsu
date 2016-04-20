@@ -90,8 +90,8 @@ typedef struct _wnet_rxinfo {
     void *extension; /* reserved for future */
 } wnet_rxinfo_t;
 
-#define TXBUF_LENGTH     1280//256
-#define RXBUF_LENGTH     1280//256               
+#define TXBUF_LENGTH     512//256
+#define RXBUF_LENGTH     512//256               
 
 #define TXBUF_NUM        1
 #define RXBUF_NUM        1

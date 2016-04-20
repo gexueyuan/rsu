@@ -751,7 +751,7 @@ int rcp_send_rtcm(uint8_t *buff,int len)
     txinfo->encryption = WNET_TRANS_ENCRYPT_NONE;
     txinfo->prority = WNET_TRANS_RRORITY_EMERGENCY;
     txinfo->timestamp = osal_get_systemtime();
-    printf("send rtcm!\n\n");
+    printf("send rtcm!, len is %d\n\n",len);
     ret = wnet_send(txinfo, (uint8_t *)p_rtcm, sizeof(rcp_msg_RTCM_Corrections_t));
     if (ret) {
         osal_printf("wnet_send failed line%d", __LINE__);

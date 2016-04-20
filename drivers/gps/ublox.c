@@ -156,9 +156,9 @@ void gps_chip_config(int fd, int freq)
 {
     /* get gps nmea. config needed nmea */
     ubx_cfg_needed_nmea(fd);
-    //osal_sleep(10);	
-    //ubx_cfg_sbas(fd,0);
     osal_sleep(10);	
+    //ubx_cfg_sbas(fd,0);
+    //osal_sleep(10);	
 #if 0
     /* conifg ublox gps rate 5Hz */
     ubx_cfg_nmea_freq(fd, freq);

@@ -378,7 +378,7 @@ typedef struct _msg_RTCM_Corrections {
     RTCM_ID_t   *rtcmID /* OPTIONAL */;
     e_GPSstatus status;
     int len;
-    uint8_t payload[1023];    
+    uint8_t payload[256];    
 
 }__COMPILE_PACK__ rcp_msg_RTCM_Corrections_t;
 

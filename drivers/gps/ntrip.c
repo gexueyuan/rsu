@@ -432,17 +432,17 @@ static int encode(char *buf, int size, const char *user, const char *pwd)
   return bytes;
 }
 
-int ntrip_main_proc(ntrip_gga_t * p_msg)
+int ntrip_main_proc(int fd,ntrip_gga_t * p_msg)
 {
   struct Args args;
-
+  static int inter = 1; 
   setbuf(stdout, 0);
   setbuf(stdin, 0);
   setbuf(stderr, 0);
-  signal(SIGALRM,sighandler_alarm);
-  signal(SIGINT,sighandler_int);
+  //signal(SIGALRM,sighandler_alarm);
+  //signal(SIGINT,sighandler_int);
   
-  alarm(ALARMTIME);
+  //alarm(ALARMTIME);
 
     printf("recieve GGA is %s\n",p_msg->gga_buff);
   if(getargs(&args,p_msg->gga_buff))
@@ -477,7 +477,7 @@ int ntrip_main_proc(ntrip_gga_t * p_msg)
       {
         sleeptime = 1;
       }
-      alarm(ALARMTIME);
+      //alarm(ALARMTIME);
       if(args.proxyhost)
       {
         int p;
@@ -778,7 +778,7 @@ int ntrip_main_proc(ntrip_gga_t * p_msg)
                     }
                     i = recv(sockfd, rtpbuf, sizeof(rtpbuf), 0);
                     
-                    alarm(ALARMTIME);
+                    //alarm(ALARMTIME);
                     
                     if(i >= 12 && (unsigned char)rtpbuf[0] == (2 << 6)
                     && rtpbuf[1] >= 96 && rtpbuf[1] <= 98)
@@ -1109,7 +1109,7 @@ int ntrip_main_proc(ntrip_gga_t * p_msg)
                       i = recvfrom(sockudp, rtpbuffer, sizeof(rtpbuffer), 0,
                       (struct sockaddr*) &addrRTP, &len);
                       
-                      alarm(ALARMTIME);
+                      //alarm(ALARMTIME);
                       
                       if(i >= 12+1 && (unsigned char)rtpbuffer[0] == (2 << 6) && rtpbuffer[1] == 0x60)
                       {
@@ -1320,10 +1320,18 @@ int ntrip_main_proc(ntrip_gga_t * p_msg)
               while(!stop && !error &&
               (numbytes=recv(sockfd, buf, MAXDATASIZE-1, 0)) > 0)
               {
-                alarm(ALARMTIME);
-                printf("%s,%u\n",__FILE__,__LINE__);
-                //printf("recive buf is %s",buf);
-
+                //alarm(ALARMTIME);
+                //printf("%s,%u\n",__FILE__,__LINE__);
+                #if 0
+                printf("\nrecive buf is %s,len is %d\n",buf,numbytes);
+                printf("\nstart \n");
+                int m =0;
+                for(m=0;m < numbytes;m++){
+                    printf("0x%X ",buf[m]);
+                }
+                
+                printf("\nend \n");
+#endif
                 if(!k)
                 {
                   //printf("%s,%u\n",__FILE__,__LINE__);
@@ -1417,7 +1425,7 @@ int ntrip_main_proc(ntrip_gga_t * p_msg)
                           {
                             int j = SerialWrite(&sx, buf+pos+ofs, i-ofs);
                             //printf("char is %c",buf[pos+ofs]);  //debug
-                            printf("%s,%u\n",__FILE__,__LINE__);
+                            printf("\n%s,%u\n",__FILE__,__LINE__);
                             if(j < 0)
                             {
                               fprintf(stderr, "Could not access serial device\n");
@@ -1454,12 +1462,27 @@ int ntrip_main_proc(ntrip_gga_t * p_msg)
                       int ofs = 0;
                       while(numbytes > ofs && !stop)
                       {
-                        //printf("\n\nbuf-serial is %s\n len is %d\n",buf,numbytes-ofs);
-                        printf("%s,%u\n",__FILE__,__LINE__);
-                        //fflush(stdout);
-                        int i = rcp_send_rtcm(buf+ofs,numbytes-ofs);//SerialWrite(&sx, buf+ofs, numbytes-ofs);//numbytes-ofs;//
+                        //printf("\n\nbuf-serial is %s\n len is %d\n",buf+ofs,numbytes-ofs);
+                        //printf("\nserial start \n");
+                       // int m =0;
+                       // for(m=0;m < numbytes-ofs;m++){
+                       //     printf("0x%X ",buf[ofs+m]);
+                       // }
                         
+                      //  printf("\nserial end \n");
+                       // printf("%s,%u\n",__FILE__,__LINE__);
+                        //fflush(stdout);
+                        int i;
+                        //if(1 == inter){
+                            i = rcp_send_rtcm(buf+ofs,numbytes-ofs);//SerialWrite(&sx, buf+ofs, numbytes-ofs);//numbytes-ofs;//
+                            //inter = 0;
+                            //}
+                      //  else{
+                         //   i = numbytes-ofs;
+                          //  inter = 1;
+                      //  }
                         //i = SerialWrite(&sx, buf+ofs, numbytes-ofs);
+                        // i = os_device_write(fd,buf+ofs,numbytes-ofs);
                         if(i < 0)
                         {
                           fprintf(stderr, "Could not access serial device\n");
@@ -1470,28 +1493,24 @@ int ntrip_main_proc(ntrip_gga_t * p_msg)
                       }
                     }
                     else{
-                        printf("write to stdout!\n");
                       fwrite(buf, (size_t)numbytes, 1, stdout);
                         }
-                    printf("%s,%u\n",__FILE__,__LINE__);
                   }
                   fflush(stdout);
-                  printf("%s,%u\n",__FILE__,__LINE__);
                   if(totalbytes < 0) /* overflow */
                   {
                     totalbytes = 0;
                     starttime = time(0);
                     lastout = starttime;
                   }
-                  printf("%s,%u\n",__FILE__,__LINE__);
+                  //printf("%s,%u\n",__FILE__,__LINE__);
                   if(args.serdevice && !stop)
                   {
                     int doloop = 1;
                     
-                    printf("%s,%u\n",__FILE__,__LINE__);
                     while(doloop && !stop)
                     {
-                      int i = SerialRead(&sx, buf, 200);
+                      int i = 200;//os_device_read(fd,buf,200);//SerialRead(&sx, buf, 200);//200;//
                       if(i < 0)
                       {
                         fprintf(stderr, "Could not access serial device\n");
@@ -1545,7 +1564,7 @@ int ntrip_main_proc(ntrip_gga_t * p_msg)
                       }
                     }
                   }
-                  printf("%s,%u\n",__FILE__,__LINE__);
+                  //printf("%s,%u\n",__FILE__,__LINE__);
                   if(args.bitrate)
                   {
                     int t = time(0);
@@ -1557,17 +1576,18 @@ int ntrip_main_proc(ntrip_gga_t * p_msg)
                     }
                   }
                 }
-                printf("%s,%u\n",__FILE__,__LINE__);
+                //printf("%s,%u\n",__FILE__,__LINE__);
+                //memset(buf,0,MAXDATASIZE);
               }
             }
             else
             {
             
-            printf("%s,%u\n",__FILE__,__LINE__);
+            //printf("%s,%u\n",__FILE__,__LINE__);
               sleeptime = 0;
               while(!stop && (numbytes=recv(sockfd, buf, MAXDATASIZE-1, 0)) > 0)
               {
-                alarm(ALARMTIME);
+               // alarm(ALARMTIME);
                 fwrite(buf, (size_t)numbytes, 1, stdout);
               }
             }
@@ -1593,17 +1613,25 @@ void * ntrip_thread_entry (void *parameter)
     ntrip_gga_t * *p_msg;
     vam_envar_t *p_vam = (vam_envar_t *)parameter;
     uint32_t len = 0;
-    uint8_t buf[VAM_MQ_MSG_SIZE];
-    
-    //OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_INFO, "%s: ---->\n", __FUNCTION__);
+    uint8_t buf[VAM_MQ_MSG_SIZE];    
+    int rtcm_fd = -1;
+	/*  ´ò¿ª´®¿Ú */
+	rtcm_fd = os_device_open(GPS_DEVICE_NAME);
 
-    //p_msg = (ntrip_gga_t *)buf;
+	if (rtcm_fd < 0){
+        
+		osal_printf("Can't Open Serial Port!\n");
+		exit(0);
+    }
+    else 
+        osal_printf("open success!\n");
+
     
 	while(1){
         //memset(buf, 0, sizeof());
         err = osal_queue_recv(queue_ntrip, &p_msg, &len, OSAL_WAITING_FOREVER);
         if (err == OSAL_STATUS_SUCCESS && len > 0){
-            ntrip_main_proc(p_msg);
+            ntrip_main_proc(rtcm_fd,p_msg);
         }
         else{
             printf("receive ntrip msg error!\n");
