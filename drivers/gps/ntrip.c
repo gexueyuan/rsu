@@ -1463,13 +1463,13 @@ int ntrip_main_proc(int fd,ntrip_gga_t * p_msg)
                       while(numbytes > ofs && !stop)
                       {
                         //printf("\n\nbuf-serial is %s\n len is %d\n",buf+ofs,numbytes-ofs);
-                        //printf("\nserial start \n");
-                       // int m =0;
-                       // for(m=0;m < numbytes-ofs;m++){
-                       //     printf("0x%X ",buf[ofs+m]);
-                       // }
+                        printf("\nserial start \n");
+                        int m =0;
+                        for(m=0;m < numbytes-ofs;m++){
+                            printf("0x%X,",buf[ofs+m]);
+                        }
                         
-                      //  printf("\nserial end \n");
+                        printf("\nserial end \n");
                        // printf("%s,%u\n",__FILE__,__LINE__);
                         //fflush(stdout);
                         int i;
