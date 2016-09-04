@@ -20,7 +20,7 @@
 #include "cv_cms_def.h"
 #include "cv_wnet.h"
 
-
+#include "J2735.h"
 #include "cv_dsmp.h"
 
 
@@ -84,7 +84,7 @@ int dsmp_recv(wnet_envar_t *p_wnet, wnet_rxinfo_t *rxinfo,
     uint8_t id = 0;
     uint32_t aid = 0;
     dsmp_hdr_t *p_dsmp;
-    security_info_t *p_sec_info = NULL;    
+    security_info_t *p_sec_info = NULL;
     security_hdr_t *p_sec_hdr  = (security_hdr_t *)pdata;
     
 
@@ -94,6 +94,10 @@ int dsmp_recv(wnet_envar_t *p_wnet, wnet_rxinfo_t *rxinfo,
         len = SECURITY_HEADER_LEN;
         pdata += len;
         p_sec_info = (security_info_t *)pdata;
+        if(p_sec_info->enc_type)
+        {
+        	//
+        }
         len += SECURITY_INFO_LEN;
         pdata += len;        
     }

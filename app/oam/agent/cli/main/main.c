@@ -130,7 +130,7 @@ static void* sigmgr_thread(void *args)
 
     return NULL;
 }
-void vtysh_reset();
+void vtysh_reset(void);
 
 void sigsegv_pro(int sig)
 {
@@ -139,7 +139,7 @@ void sigsegv_pro(int sig)
 }
 
 /* Initialization of signal handles. */
-void signal_init ()
+void signal_init (void)
 {
     sigset_t bset, oset;
     pthread_t       ppid;

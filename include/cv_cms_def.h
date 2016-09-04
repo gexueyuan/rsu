@@ -58,11 +58,13 @@
 #define VAM_MQ_MSG_SIZE 128
 #define VSA_MQ_MSG_SIZE 128
 #define SYS_MQ_MSG_SIZE 128
-#define WNET_MQ_MSG_SIZE 512
+#define WNET_MQ_MSG_SIZE 2048
+#define EHM_MQ_MSG_SIZE	128
 
-enum SYSTEM_MSG_TYPE{
+enum SYSTEM_MSG_TYPE
+{
     SYS_MSG_BASE = 0x0000,
-    SYS_MSG_INITED,
+    SYS_MSG_INITED,    
     SYS_MSG_KEY_PRESSED,
     SYS_MSG_KEY_RELEASED,
     SYS_MSG_START_ALERT,
@@ -83,22 +85,10 @@ enum SYSTEM_MSG_TYPE{
     VAM_MSG_NEIGH_TIMEOUT,
     VAM_MSG_GPSDATA,
 
-
-    VSA_MSG_BASE = 0x0300,
-    VSA_MSG_MANUAL_BC,   
-    VSA_MSG_EEBL_BC,
-    VSA_MSG_AUTO_BC,
-    
-    VSA_MSG_CFCW_ALARM,
-    VSA_MSG_CRCW_ALARM,
-    VSA_MSG_OPPOSITE_ALARM,
-    VSA_MSG_SIDE_ALARM,
-
-    VSA_MSG_ACC_RC,
-    VSA_MSG_EEBL_RC,
-    VSA_MSG_X_RC,
-    VSA_MSG_XX_RC,
-    VSA_MSG_XXX_RC
+    EHM_MSG_BASE = 0x0400,
+    EHM_MSG_VSA_RECV_DONE,
+    EHM_MSG_VSA_SEND_DATA,
+    EHM_MSG_XXX
 };
 
 enum HI_OUT_TYPE{
@@ -213,70 +203,10 @@ typedef struct _cms_global{
     mda_envar_t mda;
 }cms_global_t;
 
-
-static inline uint16_t cv_ntohs(uint16_t s16)
-{
-	uint16_t ret = 0;
-	uint8_t *s, *d;
-
-	#ifndef __LITTLE_ENDIAN	
-	ret = s16;
-	#else
-	s = (uint8_t *)(&s16);
-	d = (uint8_t *)(&ret) + 1;
-	#endif
-
-	*d-- = *s++;
-	*d-- = *s++;
-
-	return ret;
-}
-
-static inline uint32_t cv_ntohl(uint32_t l32)
-{
-	uint32_t ret = 0;
-	uint8_t *s, *d;
-
-	//#ifdef BIG_ENDIAN	
-	#ifndef __LITTLE_ENDIAN	
-	ret = l32;
-	#else
- 	s = (uint8_t *)(&l32);
- 	d = (uint8_t *)(&ret) + 3;
-	#endif
-
-	*d-- = *s++;
-	*d-- = *s++;
-	*d-- = *s++;
-	*d-- = *s++;
-
-	return ret;
-}
-
-static inline float cv_ntohf(float f32)
-{
-	float ret;
-	uint8_t *s, *d;
-
-    #ifndef __LITTLE_ENDIAN	
-	ret = f32;
-	#else
-	s = (uint8_t *)(&f32);
-	d = (uint8_t *)(&ret) + 3;
-	#endif
-
-	*d-- = *s++;
-	*d-- = *s++;
-	*d-- = *s++;
-	*d-- = *s++;
-
-	return ret;
-}
+#define CMS_GLOBAL_T_LEN    (sizeof(cms_global_t))
 
 
-/*****************************************************************************
- * declare of global functions and variables                                 *
-*****************************************************************************/
+
 extern cms_global_t cms_envar, *p_cms_envar;
 extern cfg_param_t cms_param, *p_cms_param;
 

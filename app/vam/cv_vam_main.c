@@ -29,13 +29,11 @@
  * declaration of variables and functions                                    *
 *****************************************************************************/
 #define BSM_SEND_PERIOD_DEFAULT      1000
-#define BSM_PAUSE_HOLDTIME_DEFAULT   5000
 #define BSM_GPS_LIFE_DEFAULT         5000
 #define NEIGHBOUR_LIFE_ACCUR         1000
 #define EVAM_SEND_PERIOD_DEFAULT     (50)
 
 extern void timer_send_bsm_callback(void* parameter);
-extern void timer_bsm_pause_callback(void* parameter);
 extern void timer_send_evam_callback(void* parameter);
 extern void timer_neigh_time_callback(void* parameter);
 extern void timer_gps_life_callback(void* parameter);
@@ -53,64 +51,80 @@ vam_envar_t *p_vam_envar;
 
 void vam_main_proc(vam_envar_t *p_vam, sys_msg_t *p_msg)
 {  
-    switch(p_msg->id){
+    switch(p_msg->id)
+    {
         case VAM_MSG_START:
-            OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_TRACE, "%s: VAM_MSG_START\n", 
-                                __FUNCTION__);
+        {
+            OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_TRACE, "%s: VAM_MSG_START. \n",__FUNCTION__);
 
-            p_vam->flag |= VAM_FLAG_RX;
+            p_vam->flag |= (VAM_FLAG_RX | VAM_FLAG_TX_BSM);
+
             osal_timer_start(p_vam->timer_neighbour_life);
-            
-            if (p_vam->working_param.bsm_boardcast_mode != BSM_BC_MODE_DISABLE){
-                p_vam->flag |= VAM_FLAG_TX_BSM;
-                vsm_start_bsm_broadcast(p_vam);
-            }
-            
-            break;
-
+            vsm_start_bsm_broadcast(p_vam);
+            break;    
+        }
         case VAM_MSG_STOP:
-
-            if (p_vam->flag & VAM_FLAG_TX_BSM){
-                vsm_stop_bsm_broadcast(p_vam);
+        {
+            /* Stop send bsm timer. */
+            if(p_vam->timer_send_bsm != NULL)
+            {
+                osal_timer_stop(p_vam->timer_send_bsm);
+                p_vam->timer_send_bsm = NULL;
             }
 
-            p_vam->flag &= ~(VAM_FLAG_RX|VAM_FLAG_TX_BSM);
-            osal_timer_stop(p_vam->timer_neighbour_life);
+            /* Stop neighbour life timer. */
+            if(p_vam->timer_neighbour_life)
+            {
+                osal_timer_stop(p_vam->timer_neighbour_life);
+                p_vam->timer_neighbour_life = NULL;
+            }
+            
+            p_vam->flag &= ~(VAM_FLAG_RX | VAM_FLAG_TX_BSM);
             
             break;
-
+        }
         case VAM_MSG_RCPTX:
-            if (p_msg->argc == RCP_MSG_ID_BSM){
+        {
+            /* Send bsm message. */
+            if(p_msg->argc == RCP_MSG_ID_BSM)  
+            {
                 rcp_send_bsm(p_vam);
             }
-            if (p_msg->argc == RCP_MSG_ID_EVAM){
+
+            /* Send evam message. */
+            if(p_msg->argc == RCP_MSG_ID_EVAM) 
+            {
                 rcp_send_evam(p_vam);
             }
-            if (p_msg->argc == RCP_MSG_ID_RSA){
+
+            /* Send rsa message. */
+            if(p_msg->argc == RCP_MSG_ID_RSA)  
+            {
                 rcp_send_rsa(p_vam);
             }
-
             break;
-
+        }
         case VAM_MSG_RCPRX:
-            rcp_parse_msg(p_vam, (wnet_rxinfo_t *)p_msg->argv, \
-                          (uint8_t *)p_msg->argc, p_msg->len);
-
+        {
+            rcp_parse_msg(p_vam, (wnet_rxinfo_t *)p_msg->argv, (uint8_t *)p_msg->argc, p_msg->len);
             wnet_release_rxbuf(WNET_RXBUF_PTR(p_msg->argv));
             
             break;
-
+        }
         case VAM_MSG_NEIGH_TIMEOUT:
+        {
             vam_update_sta(p_vam);
             break;
-
+        }
         case VAM_MSG_GPSDATA:
             lip_gps_proc(p_vam, (uint8_t *)p_msg->argv, p_msg->len);
 
             break;
             
         default:
+        {
             break;
+        }       
     }
 }
 
@@ -231,9 +245,6 @@ void vam_init(void)
         BSM_SEND_PERIOD_DEFAULT, TIMER_INTERVAL|TIMER_STOPPED, TIMER_PRIO_NORMAL); 					
     osal_assert(p_vam->timer_send_bsm != NULL);
 
-    p_vam->timer_bsm_pause = osal_timer_create("tm-bp",timer_bsm_pause_callback,p_vam,\
-        BSM_PAUSE_HOLDTIME_DEFAULT, TIMER_ONESHOT|TIMER_STOPPED, TIMER_PRIO_NORMAL); 					
-    osal_assert(p_vam->timer_bsm_pause != NULL);
 
     p_vam->timer_send_evam = osal_timer_create("tm-se",timer_send_evam_callback, p_vam,\
         EVAM_SEND_PERIOD_DEFAULT, TIMER_INTERVAL|TIMER_STOPPED, TIMER_PRIO_NORMAL); 					
@@ -264,7 +275,6 @@ void vam_deinit()
     vam_envar_t *p_vam = &p_cms_envar->vam;
     osal_timer_delete(p_vam->timer_send_bsm);
     osal_timer_delete(p_vam->timer_send_evam);
-    osal_timer_delete(p_vam->timer_bsm_pause);
     osal_timer_delete(p_vam->timer_gps_life);
     osal_timer_delete(p_vam->timer_neighbour_life);
     osal_task_del(p_vam->task_vam);
@@ -281,14 +291,18 @@ void dump_pos(vam_stastatus_t *p_sta)
     osal_printf("------------sta---------\n");
     osal_printf("PID:%02x-%02x-%02x-%02x\n", p_sta->pid[0], p_sta->pid[1]\
                                           , p_sta->pid[2], p_sta->pid[3]);
-    sprintf(str,"%f", p_sta->pos.lat);
+    sprintf(str,"%f", p_sta->pos.latitude);
     osal_printf("pos.lat:%s\n", str);
-    sprintf(str,"%f", p_sta->pos.lon);
+    sprintf(str,"%f", p_sta->pos.longitude);
     osal_printf("pos.lon:%s\n", str);
-    sprintf(str,"%f", p_sta->pos.elev);
+    sprintf(str,"%f", p_sta->pos.elevation);
     osal_printf("pos.elev:%s\n", str);
-    sprintf(str,"%f", p_sta->pos.accu);
-    osal_printf("pos.accu:%s\n", str);
+    sprintf(str,"%f", p_sta->pos_accuracy.semi_major_accu);
+    osal_printf("pos.accu.semi_major_accu:%s\n", str);
+    sprintf(str,"%f", p_sta->pos_accuracy.semi_major_orientation);
+    osal_printf("pos.accu.semi_major_orientation:%s\n", str);
+    sprintf(str,"%f", p_sta->pos_accuracy.semi_minor_accu);
+    osal_printf("pos.accu.semi_minor_accu:%s\n", str);
     sprintf(str,"%f", p_sta->dir);
     osal_printf("pos.heading:%s\n", str);
     sprintf(str,"%f", p_sta->speed);

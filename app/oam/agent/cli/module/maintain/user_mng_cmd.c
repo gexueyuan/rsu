@@ -38,6 +38,7 @@ static int get_user_info(const char *pcName, char *pcPasswd, int *piPriority)
 	int iPriority;
     int online;
     int type;
+    rc_error = 0;
     get_cli_user_info(pcName, pcPasswd, piPriority, &online, &type);
 
     return rc_error;
@@ -92,7 +93,8 @@ int registe_user(char *pcUserName, int iTerminalType)
     unsigned long i;
 	int iPriority;
 	int rc_error;
-	
+
+	iPriority = 0;
     if (NULL == pcUserName)
     {
         return -1;

@@ -199,7 +199,7 @@ int drv_wifi_create_monitor_socket(drv_wifi_envar_t *drv)
 	struct sockaddr_ll ll;
 	int optval;
 	socklen_t optlen;
-    int ret;
+//    int ret;
 
     /* create monitor socket */
 	memset(&ll, 0, sizeof(ll));
@@ -322,9 +322,9 @@ int nl80211_set_interface_monitor(drv_wifi_envar_t *drv)
 	struct nl_cb *cb;
 	struct nl_cb *s_cb;
 	struct nl_msg *msg;
-	signed long long devidx = 0;
+//	signed long long devidx = 0;
 	int err;
-	enum command_identify_by command_idby = CIB_NONE;
+//	enum command_identify_by command_idby = CIB_NONE;
 
 	msg = nlmsg_alloc();
 	if (!msg) {
@@ -380,9 +380,9 @@ int nl80211_set_wiphy_txpower(drv_wifi_envar_t *drv, int mbm)
 	struct nl_cb *cb;
 	struct nl_cb *s_cb;
 	struct nl_msg *msg;
-	signed long long devidx = 0;
+//	signed long long devidx = 0;
 	int err;
-	enum command_identify_by command_idby = CIB_NONE;
+//	enum command_identify_by command_idby = CIB_NONE;
 
 	msg = nlmsg_alloc();
 	if (!msg) {
@@ -438,9 +438,9 @@ int nl80211_set_wiphy_channel(drv_wifi_envar_t *drv, int ch)
 	struct nl_cb *cb;
 	struct nl_cb *s_cb;
 	struct nl_msg *msg;
-	signed long long devidx = 0;
+//	signed long long devidx = 0;
 	int err;
-	enum command_identify_by command_idby = CIB_NONE;
+//	enum command_identify_by command_idby = CIB_NONE;
 	unsigned int freq;
 
     /* set wlan0 to monitor type */
@@ -550,7 +550,6 @@ int nl80211_send_monitor(drv_wifi_envar_t *drv,
 		printf("nl80211: sendmsg: %s\r\n", strerror(errno));
 		return -1;
 	}
-
 	return 0;
 }
 

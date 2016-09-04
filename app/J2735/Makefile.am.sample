@@ -1,0 +1,226 @@
+ASN_MODULE_SOURCES=	\
+	BasicSafetyMessage.c	\
+	PartIIid.c	\
+	BSMpartIIExtension.c	\
+	BSMcoreData.c	\
+	DDateTime.c	\
+	FullPositionVector.c	\
+	PathHistory.c	\
+	PathHistoryPointList.c	\
+	PathHistoryPoint.c	\
+	PathPrediction.c	\
+	PositionConfidenceSet.c	\
+	SpecialVehicleExtensions.c	\
+	SpeedandHeadingandThrottleConfidence.c	\
+	TransmissionAndSpeed.c	\
+	VehicleSafetyExtensions.c	\
+	VehicleDummyStruct.c	\
+	Acceleration.c	\
+	AccelerationSet4Way.c	\
+	AntiLockBrakeStatus.c	\
+	AuxiliaryBrakeStatus.c	\
+	BrakeAppliedStatus.c	\
+	BrakeBoostApplied.c	\
+	BrakeSystemStatus.c	\
+	CoarseHeading.c	\
+	Confidence.c	\
+	DSecond.c	\
+	DSRCmsgID.c	\
+	DDay.c	\
+	DHour.c	\
+	DMinute.c	\
+	DMonth.c	\
+	DOffset.c	\
+	DYear.c	\
+	Elevation.c	\
+	ElevationConfidence.c	\
+	ExteriorLights.c	\
+	GNSSstatus.c	\
+	Heading.c	\
+	HeadingConfidence.c	\
+	Latitude.c	\
+	Longitude.c	\
+	MsgCount.c	\
+	PositionalAccuracy.c	\
+	PositionConfidence.c	\
+	OffsetLL-B18.c	\
+	RadiusOfCurvature.c	\
+	RegionId.c	\
+	SemiMajorAxisAccuracy.c	\
+	SemiMajorAxisOrientation.c	\
+	SemiMinorAxisAccuracy.c	\
+	Speed.c	\
+	SpeedConfidence.c	\
+	StabilityControlStatus.c	\
+	SteeringWheelAngle.c	\
+	TemporaryID.c	\
+	ThrottleConfidence.c	\
+	TimeConfidence.c	\
+	TimeOffset.c	\
+	TractionControlStatus.c	\
+	TransmissionState.c	\
+	VehicleEventFlags.c	\
+	VehicleSize.c	\
+	VehicleLength.c	\
+	VehicleWidth.c	\
+	Velocity.c	\
+	VerticalAcceleration.c	\
+	VertOffset-B12.c	\
+	YawRate.c
+
+ASN_MODULE_HEADERS=	\
+	BasicSafetyMessage.h	\
+	PartIIid.h	\
+	BSMpartIIExtension.h	\
+	BSMcoreData.h	\
+	DDateTime.h	\
+	FullPositionVector.h	\
+	PathHistory.h	\
+	PathHistoryPointList.h	\
+	PathHistoryPoint.h	\
+	PathPrediction.h	\
+	PositionConfidenceSet.h	\
+	SpecialVehicleExtensions.h	\
+	SpeedandHeadingandThrottleConfidence.h	\
+	TransmissionAndSpeed.h	\
+	VehicleSafetyExtensions.h	\
+	VehicleDummyStruct.h	\
+	Acceleration.h	\
+	AccelerationSet4Way.h	\
+	AntiLockBrakeStatus.h	\
+	AuxiliaryBrakeStatus.h	\
+	BrakeAppliedStatus.h	\
+	BrakeBoostApplied.h	\
+	BrakeSystemStatus.h	\
+	CoarseHeading.h	\
+	Confidence.h	\
+	DSecond.h	\
+	DSRCmsgID.h	\
+	DDay.h	\
+	DHour.h	\
+	DMinute.h	\
+	DMonth.h	\
+	DOffset.h	\
+	DYear.h	\
+	Elevation.h	\
+	ElevationConfidence.h	\
+	ExteriorLights.h	\
+	GNSSstatus.h	\
+	Heading.h	\
+	HeadingConfidence.h	\
+	Latitude.h	\
+	Longitude.h	\
+	MsgCount.h	\
+	PositionalAccuracy.h	\
+	PositionConfidence.h	\
+	OffsetLL-B18.h	\
+	RadiusOfCurvature.h	\
+	RegionId.h	\
+	SemiMajorAxisAccuracy.h	\
+	SemiMajorAxisOrientation.h	\
+	SemiMinorAxisAccuracy.h	\
+	Speed.h	\
+	SpeedConfidence.h	\
+	StabilityControlStatus.h	\
+	SteeringWheelAngle.h	\
+	TemporaryID.h	\
+	ThrottleConfidence.h	\
+	TimeConfidence.h	\
+	TimeOffset.h	\
+	TractionControlStatus.h	\
+	TransmissionState.h	\
+	VehicleEventFlags.h	\
+	VehicleSize.h	\
+	VehicleLength.h	\
+	VehicleWidth.h	\
+	Velocity.h	\
+	VerticalAcceleration.h	\
+	VertOffset-B12.h	\
+	YawRate.h
+
+ASN_MODULE_HEADERS+=INTEGER.h
+ASN_MODULE_HEADERS+=NativeEnumerated.h
+ASN_MODULE_SOURCES+=INTEGER.c
+ASN_MODULE_SOURCES+=NativeEnumerated.c
+ASN_MODULE_HEADERS+=NativeInteger.h
+ASN_MODULE_SOURCES+=NativeInteger.c
+ASN_MODULE_HEADERS+=asn_SEQUENCE_OF.h
+ASN_MODULE_SOURCES+=asn_SEQUENCE_OF.c
+ASN_MODULE_HEADERS+=asn_SET_OF.h
+ASN_MODULE_SOURCES+=asn_SET_OF.c
+ASN_MODULE_HEADERS+=constr_CHOICE.h
+ASN_MODULE_SOURCES+=constr_CHOICE.c
+ASN_MODULE_HEADERS+=constr_SEQUENCE.h
+ASN_MODULE_SOURCES+=constr_SEQUENCE.c
+ASN_MODULE_HEADERS+=constr_SEQUENCE_OF.h
+ASN_MODULE_SOURCES+=constr_SEQUENCE_OF.c
+ASN_MODULE_HEADERS+=constr_SET_OF.h
+ASN_MODULE_SOURCES+=constr_SET_OF.c
+ASN_MODULE_HEADERS+=asn_application.h
+ASN_MODULE_HEADERS+=asn_system.h
+ASN_MODULE_HEADERS+=asn_codecs.h
+ASN_MODULE_HEADERS+=asn_internal.h
+ASN_MODULE_HEADERS+=OCTET_STRING.h
+ASN_MODULE_SOURCES+=OCTET_STRING.c
+ASN_MODULE_HEADERS+=BIT_STRING.h
+ASN_MODULE_SOURCES+=BIT_STRING.c
+ASN_MODULE_SOURCES+=asn_codecs_prim.c
+ASN_MODULE_HEADERS+=asn_codecs_prim.h
+ASN_MODULE_HEADERS+=ber_tlv_length.h
+ASN_MODULE_SOURCES+=ber_tlv_length.c
+ASN_MODULE_HEADERS+=ber_tlv_tag.h
+ASN_MODULE_SOURCES+=ber_tlv_tag.c
+ASN_MODULE_HEADERS+=ber_decoder.h
+ASN_MODULE_SOURCES+=ber_decoder.c
+ASN_MODULE_HEADERS+=der_encoder.h
+ASN_MODULE_SOURCES+=der_encoder.c
+ASN_MODULE_HEADERS+=constr_TYPE.h
+ASN_MODULE_SOURCES+=constr_TYPE.c
+ASN_MODULE_HEADERS+=constraints.h
+ASN_MODULE_SOURCES+=constraints.c
+ASN_MODULE_HEADERS+=xer_support.h
+ASN_MODULE_SOURCES+=xer_support.c
+ASN_MODULE_HEADERS+=xer_decoder.h
+ASN_MODULE_SOURCES+=xer_decoder.c
+ASN_MODULE_HEADERS+=xer_encoder.h
+ASN_MODULE_SOURCES+=xer_encoder.c
+ASN_MODULE_HEADERS+=per_support.h
+ASN_MODULE_SOURCES+=per_support.c
+ASN_MODULE_HEADERS+=per_decoder.h
+ASN_MODULE_SOURCES+=per_decoder.c
+ASN_MODULE_HEADERS+=per_encoder.h
+ASN_MODULE_SOURCES+=per_encoder.c
+ASN_MODULE_HEADERS+=per_opentype.h
+ASN_MODULE_SOURCES+=per_opentype.c
+ASN_CONVERTER_SOURCES+=converter-sample.c
+
+
+lib_LTLIBRARIES=libsomething.la
+libsomething_la_SOURCES=$(ASN_MODULE_SOURCES) $(ASN_MODULE_HEADERS)
+
+# This file may be used as an input for make(3)
+# Remove the lines below to convert it into a pure .am file
+TARGET = progname
+CFLAGS += -I.
+OBJS=${ASN_MODULE_SOURCES:.c=.o} ${ASN_CONVERTER_SOURCES:.c=.o}
+
+all: $(TARGET)
+
+$(TARGET): ${OBJS}
+	$(CC) $(CFLAGS) -o $(TARGET) ${OBJS} $(LDFLAGS) $(LIBS)
+
+.SUFFIXES:
+.SUFFIXES: .c .o
+
+.c.o:
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+clean:
+	rm -f $(TARGET)
+	rm -f $(OBJS)
+
+regen: regenerate-from-asn1-source
+
+regenerate-from-asn1-source:
+	asn1c -gen-PER J2735_WXW.ASN
+

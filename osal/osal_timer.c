@@ -84,10 +84,12 @@ osal_status_t osal_timer_start(osal_timer_t *timer)
 **/
 osal_status_t osal_timer_stop(osal_timer_t *timer)
 {
-
     int ret;
     timer_t timerid;
-    if (timer == NULL){
+
+    
+    if(timer == NULL)
+    {
         return OSAL_STATUS_EMPTY;
     }
     timerid = *timer;

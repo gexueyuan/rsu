@@ -89,7 +89,7 @@ extern int g_dbg_print_type;
 void osal_dbg_dump_data(uint8_t *p, uint32_t len);
 int osal_dbg_set_level(char *module, int level);
 void dbg_buf_print(uint8_t *pbuf , uint32_t len);
-
+void osal_printf_unbuf(const char * fmt, ...);
 
 #endif /* __CV_OSAL_DBG_H__ */
 

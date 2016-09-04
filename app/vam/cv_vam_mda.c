@@ -14,7 +14,7 @@
 #define OSAL_MODULE_DEBUG_LEVEL OSAL_DEBUG_INFO
 #define MODULE_NAME "mda"
 #include "cv_osal_dbg.h"
-
+#include "osal_sem.h"
 #include "cv_vam.h"
 #include "cv_cms_def.h"
 #include "cv_wnet.h"
@@ -359,8 +359,7 @@ int mda_handle(mda_envar_t *p_mda,
                 add_forward_list(p_mda, txbuf, src_sta, forward_delay_time);
             }
         }
-    }
-    else {
+    }else {
         txbuf = find_forward_list(p_mda, src_sta);
         if (txbuf) {
             /* Received the same frame */

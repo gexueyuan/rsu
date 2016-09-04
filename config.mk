@@ -1,6 +1,5 @@
-TOOLCHAIN_PATH=/home/gexueyuan/bin/gcc-4.6.2-glibc-2.13-linaro-multilib-2011.12/fsl-linaro-toolchain/bin/
-CROSS_COMPILE=$(TOOLCHAIN_PATH)arm-linux-
-
+TOOLCHAIN_PATH=/home/gexueyuan/bin/gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux/bin/
+CROSS_COMPILE=$(TOOLCHAIN_PATH)arm-linux-gnueabihf-
 AS      = $(CROSS_COMPILE)as
 LD      = $(CROSS_COMPILE)ld
 CC      = $(CROSS_COMPILE)gcc

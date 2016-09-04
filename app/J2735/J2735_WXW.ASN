@@ -1,0 +1,727 @@
+-- 
+-- ASN.1 file for J2735-201603.
+-- Created by wxw.
+
+
+
+-- The local module consisting of DEs / DFs and MSGs
+DSRC DEFINITIONS AUTOMATIC TAGS::= BEGIN 
+
+
+-- MSG_BasicSafetyMessage  (BSM) (Desc Name)
+BasicSafetyMessage ::= SEQUENCE {
+   dsrcMsgId DSRCmsgID,
+
+   -- Part I, Sent at all times with each message
+   coreData BSMcoreData,
+
+   -- Part II Content
+   partII SEQUENCE (SIZE(1..8)) OF BSMpartIIExtension OPTIONAL,
+   
+   -- regional SEQUENCE (SIZE(1..4)) OF
+   -- RegionalExtension {{REGION.Reg-BasicSafetyMessage}} OPTIONAL,
+
+   ...
+}
+
+-- DE_PartIIId (Useless and only for DF_BSMpartIIExtension mark.)
+PartIIid ::= INTEGER (0..63)
+   vehicleSafetyExtd       PartIIid::= 0 -- VehicleSafetyExtensions
+   specialVehicleExtd      PartIIid::= 1 -- SpecialVehicleExtensions
+   supplementalVehicleExtd PartIIid::= 2 -- SupplementalVehicleExtensions
+   -- NOTE: new registered Part II content IDs will be denoted here
+
+-- DF_BSMpartIIExtension
+BSMpartIIExtension ::= CHOICE {
+   vehicleSafetyExt       VehicleSafetyExtensions,
+   specialVehicleExt      SpecialVehicleExtensions,
+   --supplementalVehicleExt SupplementalVehicleExtensions
+
+   vehicleDummySt1        VehicleDummyStruct,
+   vehicleDummySt2        VehicleDummyStruct,
+   vehicleDummySt3        VehicleDummyStruct,
+   vehicleDummySt4        VehicleDummyStruct,
+   vehicleDummySt5        VehicleDummyStruct,
+   vehicleDummySt6        VehicleDummyStruct,
+   vehicleDummySt7        VehicleDummyStruct,
+   vehicleDummySt8        VehicleDummyStruct,
+   vehicleDummySt9        VehicleDummyStruct,
+   vehicleDummySt10       VehicleDummyStruct,
+
+   vehicleDummySt11       VehicleDummyStruct,
+   vehicleDummySt12       VehicleDummyStruct,
+   vehicleDummySt13       VehicleDummyStruct,
+   vehicleDummySt14       VehicleDummyStruct,
+   vehicleDummySt15       VehicleDummyStruct,
+   vehicleDummySt16       VehicleDummyStruct,
+   vehicleDummySt17       VehicleDummyStruct,
+   vehicleDummySt18       VehicleDummyStruct,
+   vehicleDummySt19       VehicleDummyStruct,
+   vehicleDummySt20       VehicleDummyStruct,
+
+   vehicleDummySt21       VehicleDummyStruct,
+   vehicleDummySt22       VehicleDummyStruct,
+   vehicleDummySt23       VehicleDummyStruct,
+   vehicleDummySt24       VehicleDummyStruct,
+   vehicleDummySt25       VehicleDummyStruct,
+   vehicleDummySt26       VehicleDummyStruct,
+   vehicleDummySt27       VehicleDummyStruct,
+   vehicleDummySt28       VehicleDummyStruct,
+   vehicleDummySt29       VehicleDummyStruct,
+   vehicleDummySt30       VehicleDummyStruct,
+
+   vehicleDummySt31       VehicleDummyStruct,
+   vehicleDummySt32       VehicleDummyStruct,
+   vehicleDummySt33       VehicleDummyStruct,
+   vehicleDummySt34       VehicleDummyStruct,
+   vehicleDummySt35       VehicleDummyStruct,
+   vehicleDummySt36       VehicleDummyStruct,
+   vehicleDummySt37       VehicleDummyStruct,
+   vehicleDummySt38       VehicleDummyStruct,
+   vehicleDummySt39       VehicleDummyStruct,
+   vehicleDummySt40       VehicleDummyStruct,   
+
+   vehicleDummySt51       VehicleDummyStruct,
+   vehicleDummySt52       VehicleDummyStruct,
+   vehicleDummySt53       VehicleDummyStruct,
+   vehicleDummySt54       VehicleDummyStruct,
+   vehicleDummySt55       VehicleDummyStruct,
+   vehicleDummySt56       VehicleDummyStruct,
+   vehicleDummySt57       VehicleDummyStruct,
+   vehicleDummySt58       VehicleDummyStruct,
+   vehicleDummySt59       VehicleDummyStruct,
+   vehicleDummySt60       VehicleDummyStruct,   
+   vehicleDummySt61       VehicleDummyStruct
+}
+
+-- DF_BSMcoreData
+BSMcoreData ::= SEQUENCE {
+   msgCnt       MsgCount,
+   id           TemporaryID,
+   secMark      DSecond,
+   lat          Latitude,
+   long         Longitude,
+   elev         Elevation,
+   accuracy     PositionalAccuracy,
+   transmission TransmissionState,
+   speed        Speed,
+   heading      Heading,
+   angle        SteeringWheelAngle,
+   accelSet     AccelerationSet4Way,
+   brakes       BrakeSystemStatus,
+   size         VehicleSize
+}
+
+-- DF_DDateTime
+DDateTime ::= SEQUENCE {
+   year   DYear OPTIONAL,
+   month  DMonth OPTIONAL,
+   day    DDay OPTIONAL,
+   hour   DHour OPTIONAL,
+   minute DMinute OPTIONAL,
+   second DSecond OPTIONAL,
+   offset DOffset OPTIONAL -- time zone
+   }
+
+-- DF_FullPositionVector
+FullPositionVector ::= SEQUENCE {
+   utcTime         DDateTime OPTIONAL, -- time with mSec precision
+   long            Longitude,          -- 1/10th microdegree
+   lat             Latitude,           -- 1/10th microdegree
+   elevation       Elevation OPTIONAL, -- units of 0.1 m
+   heading         Heading OPTIONAL,
+   speed           TransmissionAndSpeed OPTIONAL,
+   posAccuracy     PositionalAccuracy OPTIONAL,
+   timeConfidence  TimeConfidence OPTIONAL,
+   posConfidence   PositionConfidenceSet OPTIONAL,
+   speedConfidence SpeedandHeadingandThrottleConfidence OPTIONAL,
+   ...
+   }
+
+-- DF_PathHistory
+PathHistory ::= SEQUENCE {
+   initialPosition FullPositionVector OPTIONAL,
+   currGNSSstatus  GNSSstatus OPTIONAL,
+   crumbData       PathHistoryPointList,
+   ...
+   }
+
+-- DF_PathHistoryPointList
+PathHistoryPointList ::= SEQUENCE (SIZE(1..23)) OF PathHistoryPoint
+
+-- DF_PathHistoryPoint
+PathHistoryPoint ::= SEQUENCE {
+   latOffset       OffsetLL-B18,
+   lonOffset       OffsetLL-B18,
+   elevationOffset VertOffset-B12,
+   timeOffset      TimeOffset,
+                   -- Offset backwards in time
+   speed           Speed OPTIONAL,
+                   -- Speed over the reported period
+   posAccuracy     PositionalAccuracy OPTIONAL,
+                   -- The accuracy of this value
+   heading         CoarseHeading OPTIONAL,
+                   -- overall heading
+   ...
+   }
+
+-- DF_PathPrediction
+PathPrediction ::= SEQUENCE {
+   radiusOfCurve RadiusOfCurvature,
+                 -- LSB units of 10cm
+                 -- straight path to use value of 32767
+   confidence    Confidence,
+                 -- LSB units of 0.5 percent
+   ...
+   }
+
+-- DF_PositionConfidenceSet
+PositionConfidenceSet ::= SEQUENCE {
+   pos       PositionConfidence, -- for both horizontal directions
+   elevation ElevationConfidence
+   }
+
+
+-- DF_SpecialVehicleExtensions
+SpecialVehicleExtensions ::= SEQUENCE {
+   events         VehicleEventFlags OPTIONAL,
+   ...
+   }
+
+-- DF_SPeedandHeadingandThrottleConfidence
+SpeedandHeadingandThrottleConfidence ::= SEQUENCE {
+   heading  HeadingConfidence,
+   speed    SpeedConfidence,
+   throttle ThrottleConfidence
+   }
+
+-- DF_TransmissionAndSpeed
+TransmissionAndSpeed ::= SEQUENCE {
+   transmisson TransmissionState,
+   speed       Velocity
+   }
+
+-- DF_VehicleSafetyExtensions
+VehicleSafetyExtensions ::= SEQUENCE {
+   events         VehicleEventFlags OPTIONAL,
+   pathHistory    PathHistory       OPTIONAL,
+   pathPrediction PathPrediction    OPTIONAL,
+   lights         ExteriorLights    OPTIONAL,
+   
+   ...
+   }
+
+-- DF_VehicleDummyStruct
+VehicleDummyStruct ::= SEQUENCE {
+   events         VehicleEventFlags OPTIONAL,
+   pathHistory    PathHistory       OPTIONAL,
+   ...
+   }
+
+
+
+
+
+
+
+
+
+
+
+-- DE_Acceleration
+Acceleration ::= INTEGER (-2000..2001)
+   -- LSB units are 0.01 m/s^2
+   -- the value 2000 shall be used for values greater than 2000
+   -- the value -2000 shall be used for values less than -2000
+   -- a value of 2001 shall be used for Unavailable
+
+-- DE_AccelerationSet4Way
+AccelerationSet4Way ::= SEQUENCE {
+   long Acceleration,         -- Along the Vehicle Longitudinal axis
+   lat  Acceleration,         -- Along the Vehicle Lateral axis
+   vert VerticalAcceleration, -- Along the Vehicle Vertical axis
+   yaw  YawRate
+   }
+
+-- DE_AntiLockBrakeStatus
+AntiLockBrakeStatus ::= ENUMERATED {
+   unavailable (0), -- B'00 Vehicle Not Equipped with ABS Brakes
+                    -- or ABS Brakes status is unavailable
+   off         (1), -- B'01 Vehicle's ABS are Off
+   on          (2), -- B'10 Vehicle's ABS are On ( but not Engaged )
+   engaged     (3)  -- B'11 Vehicle's ABS control is Engaged on any wheel
+   }
+
+-- DE_AuxiliaryBrakeStatus
+AuxiliaryBrakeStatus ::= ENUMERATED {
+   unavailable (0), -- B'00 Vehicle Not Equipped with Aux Brakes
+                    -- or Aux Brakes status is unavailable
+   off         (1), -- B'01 Vehicle's Aux Brakes are Off
+   on          (2), -- B'10 Vehicle's Aux Brakes are On ( Engaged )
+   reserved    (3)  -- B'11
+   }
+
+-- DE_BrakeAppliedStatus
+BrakeAppliedStatus ::= BIT STRING {
+   unavailable (0), -- When set, the brake applied status is unavailable
+   leftFront   (1), -- Left Front Active
+   leftRear    (2), -- Left Rear Active
+   rightFront  (3), -- Right Front Active
+   rightRear   (4)  -- Right Rear Active
+   } (SIZE (5))
+
+-- BrakeBoostApplied
+BrakeBoostApplied ::= ENUMERATED {
+   unavailable (0), -- Vehicle not equipped with brake boost
+                    -- or brake boost data is unavailable
+   off         (1), -- Vehicle's brake boost is off
+   on          (2)  -- Vehicle's brake boost is on (applied)
+   }
+
+-- DE_BrakeSystemStatus
+BrakeSystemStatus ::= SEQUENCE {
+   wheelBrakes BrakeAppliedStatus,
+   traction    TractionControlStatus,
+   abs         AntiLockBrakeStatus,
+   scs         StabilityControlStatus,
+   brakeBoost  BrakeBoostApplied,
+   auxBrakes   AuxiliaryBrakeStatus
+   }
+
+
+-- DE_CoarseHeading
+CoarseHeading ::= INTEGER (0..240)
+   -- Where the LSB is in units of 1.5 degrees
+   -- over a range of 0~358.5 degrees
+   -- the value 240 shall be used for unavailable
+
+-- DE_Confidence
+Confidence ::= INTEGER (0..200)
+   -- LSB units of 0.5 percent
+
+-- DE_DSecond
+DSecond ::= INTEGER (0..65535) -- units of milliseconds
+
+-- DE_DSRC_MessageID
+DSRCmsgID ::= INTEGER (0..32767)
+   --
+   -- DER forms,
+   -- All DER forms are now retired and not to be used
+   --
+   reservedMessageId-D           DSRCmsgID ::= 0 --'00'H
+   alaCarteMessage-D             DSRCmsgID ::= 1 --'01'H ACM
+   -- alaCarteMessage-D is Retired, not to be used
+   basicSafetyMessage-D          DSRCmsgID ::= 2 --'02'H BSM, heartbeat msg
+   basicSafetyMessageVerbose-D   DSRCmsgID ::= 3 --'03'H For testing onlySAE 
+   commonSafetyRequest-D         DSRCmsgID ::= 4 --'04'H CSR
+   emergencyVehicleAlert-D       DSRCmsgID ::= 5 --'05'H EVA
+   intersectionCollision-D       DSRCmsgID ::= 6 --'06'H ICA
+   mapData-D                     DSRCmsgID ::= 7 --'07'H MAP, intersections
+   nmeaCorrections-D             DSRCmsgID ::= 8 --'08'H NMEA
+   probeDataManagement-D         DSRCmsgID ::= 9 --'09'H PDM
+   probeVehicleData-D            DSRCmsgID ::= 10 --'0A'H PVD
+   roadSideAlert-D               DSRCmsgID ::= 11 --'0B'H RSA
+   rtcmCorrections-D             DSRCmsgID ::= 12 --'0C'H RTCM
+   signalPhaseAndTimingMessage-D DSRCmsgID ::= 13 --'0D'H SPAT
+   signalRequestMessage-D        DSRCmsgID ::= 14 --'0E'H SRM
+   signalStatusMessage-D         DSRCmsgID ::= 15 --'0F'H SSM
+   travelerInformation-D         DSRCmsgID ::= 16 --'10'H TIM
+   uperFrame-D                   DSRCmsgID ::= 17 --'11'H UPER frame
+   --
+   -- UPER forms
+   --
+   mapData                       DSRCmsgID ::= 18 -- MAP, intersections
+   signalPhaseAndTimingMessage   DSRCmsgID ::= 19 -- SPAT
+   -- Above two entries were adopted in the 2015-04 edition
+   -- Message assignments added in 2015 follow below
+   basicSafetyMessage            DSRCmsgID ::= 20 -- BSM, heartbeat msg
+   commonSafetyRequest           DSRCmsgID ::= 21 -- CSR
+   emergencyVehicleAlert         DSRCmsgID ::= 22 -- EVA
+   intersectionCollision         DSRCmsgID ::= 23 -- ICA
+   nmeaCorrections               DSRCmsgID ::= 24 -- NMEA
+   probeDataManagement           DSRCmsgID ::= 25 -- PDM
+   probeVehicleData              DSRCmsgID ::= 26 -- PVD
+   roadSideAlert                 DSRCmsgID ::= 27 -- RSA
+   rtcmCorrections               DSRCmsgID ::= 28 -- RTCM
+   signalRequestMessage          DSRCmsgID ::= 29 -- SRM
+   signalStatusMessage           DSRCmsgID ::= 30 -- SSM
+   travelerInformation           DSRCmsgID ::= 31 -- TIM
+   personalSafetyMessage         DSRCmsgID ::= 32 -- PSM
+   
+   --
+   -- The Below values are reserved for local message testing use
+   --
+   testMessage00 DSRCmsgID ::= 240 -- Hex 0xF0
+   testMessage01 DSRCmsgID ::= 241
+   testMessage02 DSRCmsgID ::= 242
+   testMessage03 DSRCmsgID ::= 243
+   testMessage04 DSRCmsgID ::= 244
+   testMessage05 DSRCmsgID ::= 245
+   testMessage06 DSRCmsgID ::= 246
+   testMessage07 DSRCmsgID ::= 247
+   testMessage08 DSRCmsgID ::= 248
+   testMessage09 DSRCmsgID ::= 249
+   testMessage10 DSRCmsgID ::= 250
+   testMessage11 DSRCmsgID ::= 251
+   testMessage12 DSRCmsgID ::= 252
+   testMessage13 DSRCmsgID ::= 253
+   testMessage14 DSRCmsgID ::= 254
+   testMessage15 DSRCmsgID ::= 255-- Hex 0xFF
+   --
+   -- All other values are reserved for std use
+
+-- DE_DDay
+DDay ::= INTEGER (0..31) -- units of days
+
+-- DE_DHour
+DHour ::= INTEGER (0..31) -- units of hours
+
+-- DE_DMinute
+DMinute ::= INTEGER (0..60) -- units of minutes
+
+-- DE_DMonth
+DMonth ::= INTEGER (0..12) -- units of months
+
+-- DE_DOffset
+DOffset ::= INTEGER (-840..840) -- units of minutes from UTC time
+
+-- DE_DYear
+DYear ::= INTEGER (0..4095) -- units of years
+
+
+-- DE_Elevation
+Elevation ::= INTEGER (-4096..61439)
+   -- In units of 10 cm steps above or below the reference ellipsoid
+   -- Providing a range of -409.5 to + 6143.9 meters
+   -- The value -4096 shall be used when Unknown is to be sent
+
+-- DE_ElevationConfidence
+ElevationConfidence ::= ENUMERATED {
+   unavailable (0), -- B'0000 Not Equipped or unavailable
+   elev-500-00 (1), -- B'0001 (500 m)
+   elev-200-00 (2), -- B'0010 (200 m)
+   elev-100-00 (3), -- B'0011 (100 m)
+   elev-050-00 (4), -- B'0100 (50 m)
+   elev-020-00 (5), -- B'0101 (20 m)
+   elev-010-00 (6), -- B'0110 (10 m)
+   elev-005-00 (7), -- B'0111 (5 m)
+   elev-002-00 (8), -- B'1000 (2 m)
+   elev-001-00 (9), -- B'1001 (1 m)
+   elev-000-50 (10), -- B'1010 (50 cm)
+   elev-000-20 (11), -- B'1011 (20 cm)
+   elev-000-10 (12), -- B'1100 (10 cm)
+   elev-000-05 (13), -- B'1101 (5 cm)
+   elev-000-02 (14), -- B'1110 (2 cm)
+   elev-000-01 (15) -- B'1111 (1 cm)
+   } -- Encoded as a 4 bit value
+
+-- DE_ExteriorLights
+ExteriorLights ::= BIT STRING {
+   -- All lights off is indicated by no bits set
+   lowBeamHeadlightsOn     (0),
+   highBeamHeadlightsOn    (1),
+   leftTurnSignalOn        (2),
+   rightTurnSignalOn       (3),
+   hazardSignalOn          (4),
+   automaticLightControlOn (5),
+   daytimeRunningLightsOn  (6),
+   fogLightOn              (7),
+   parkingLightsOn         (8)
+   } (SIZE (9, ...))
+
+-- DE_GNSSstatus
+GNSSstatus ::= BIT STRING {
+   unavailable               (0), -- Not Equipped or unavailable
+   isHealthy                 (1),
+   isMonitored               (2),
+   baseStationType           (3), -- Set to zero if a moving base station,
+                                  -- or if a rover device (an OBU),
+                                  -- set to one if it is a fixed base station
+   aPDOPofUnder5             (4), -- A dilution of precision greater than 5
+   inViewOfUnder5            (5), -- Less than 5 satellites in view
+   localCorrectionsPresent   (6), -- DGPS type corrections used
+   networkCorrectionsPresent (7)  -- RTK type corrections used
+   } (SIZE(8))
+
+-- DE_Heading
+Heading ::= INTEGER (0..28800)
+   -- LSB of 0.0125 degrees
+   -- A range of 0 to 359.9875 degrees
+
+-- DE_HeadingConfidence
+HeadingConfidence ::= ENUMERATED {
+   unavailable   (0), -- B'000 Not Equipped or unavailable
+   prec10deg     (1), -- B'010 10 degrees
+   prec05deg     (2), -- B'011 5 degrees
+   prec01deg     (3), -- B'100 1 degrees
+   prec0-1deg    (4), -- B'101 0.1 degrees
+   prec0-05deg   (5), -- B'110 0.05 degrees
+   prec0-01deg   (6), -- B'110 0.01 degrees
+   prec0-0125deg (7) -- B'111 0.0125 degrees, aligned with heading LSB
+   } -- Encoded as a 3 bit value
+
+-- DE_Latitude
+Latitude ::= INTEGER (-900000000..900000001)
+   -- LSB = 1/10 micro degree
+   -- Providing a range of plus-minus 90 degrees
+
+-- DE_Longitude
+Longitude ::= INTEGER (-1799999999..1800000001)
+   -- LSB = 1/10 micro degree
+   -- Providing a range of plus-minus 180 degrees
+
+-- DE_MsgCount
+MsgCount ::= INTEGER (0..127)
+
+-- DE_PositionAccuracy
+PositionalAccuracy ::= SEQUENCE {
+   -- NMEA-183 values expressed in strict ASN form
+   semiMajor SemiMajorAxisAccuracy,
+   semiMinor SemiMinorAxisAccuracy,
+   orientation SemiMajorAxisOrientation
+   }
+
+-- DE_PositionConfidence
+PositionConfidence ::= ENUMERATED {
+   unavailable (0), -- B'0000 Not Equipped or unavailable
+   a500m       (1), -- B'0001 500m or about 5 * 10 ^ -3 decimal degrees
+   a200m       (2), -- B'0010 200m or about 2 * 10 ^ -3 decimal degrees
+   a100m       (3), -- B'0011 100m or about 1 * 10 ^ -3 decimal degrees
+   a50m        (4), -- B'0100 50m or about 5 * 10 ^ -4 decimal degrees
+   a20m        (5), -- B'0101 20m or about 2 * 10 ^ -4 decimal degrees
+   a10m        (6), -- B'0110 10m or about 1 * 10 ^ -4 decimal degrees
+   a5m         (7), -- B'0111 5m or about 5 * 10 ^ -5 decimal degrees
+   a2m         (8), -- B'1000 2m or about 2 * 10 ^ -5 decimal degrees
+   a1m         (9), -- B'1001 1m or about 1 * 10 ^ -5 decimal degrees
+   a50cm      (10), -- B'1010 0.50m or about 5 * 10 ^ -6 decimal degrees
+   a20cm      (11), -- B'1011 0.20m or about 2 * 10 ^ -6 decimal degrees
+   a10cm      (12), -- B'1100 0.10m or about 1 * 10 ^ -6 decimal degrees
+   a5cm       (13), -- B'1101 0.05m or about 5 * 10 ^ -7 decimal degrees
+   a2cm       (14), -- B'1110 0.02m or about 2 * 10 ^ -7 decimal degrees
+   a1cm       (15)  -- B'1111 0.01m or about 1 * 10 ^ -7 decimal degrees
+   }
+   -- Encoded as a 4 bit value
+   
+-- DE_OffsetLL-B18
+OffsetLL-B18 ::= INTEGER (-131072..131071)
+   -- A range of +- 0.0131071 degrees
+   -- The value +131071 shall be used for values >= than +0.0131071 degrees
+   -- The value -131071 shall be used for values <= than -0.0131071 degrees
+   -- The value -131072 shall be used unknown
+   -- In LSB units of 0.1 microdegrees (unless a zoom is employed)
+
+-- DE_RadiusOfCurvature
+RadiusOfCurvature ::= INTEGER (-32767..32767)
+   -- LSB units of 10cm
+   -- A straight path to use value of 32767
+
+-- DE_RegionId
+RegionId ::= INTEGER (0..255)
+   noRegion RegionId ::= 0 -- Use default supplied stubs
+   addGrpA  RegionId ::= 1 -- USA
+   addGrpB  RegionId ::= 2 -- Japan
+   addGrpC  RegionId ::= 3 -- EU
+   -- NOTE: new registered regional IDs will be added here
+   -- The values 128 and above are for local region use
+
+-- DE_SemiMajorAxisAccuracy
+SemiMajorAxisAccuracy ::= INTEGER (0..255)
+   -- semi-major axis accuracy at one standard dev
+   -- range 0-12.7 meter, LSB = .05m
+   -- 254 = any value equal or greater than 12.70 meter
+   -- 255 = unavailable semi-major axis value
+
+-- DE_SemiMajorAxisOrientation
+SemiMajorAxisOrientation ::= INTEGER (0..65535)
+   -- orientation of semi-major axis
+   -- relative to true north (0~359.9945078786 degrees)
+   -- LSB units of 360/65535 deg = 0.0054932479
+   -- a value of 0 shall be 0 degrees
+   -- a value of 1 shall be 0.0054932479 degrees
+   -- a value of 65534 shall be 359.9945078786 deg
+   -- a value of 65535 shall be used for orientation unavailable
+
+-- DE_SemiMinorAxisAccuracy
+SemiMinorAxisAccuracy ::= INTEGER (0..255)
+   -- semi-minor axis accuracy at one standard dev
+   -- range 0-12.7 meter, LSB = .05m
+   -- 254 = any value equal or greater than 12.70 meter
+   -- 255 = unavailable semi-minor axis value
+
+-- DE_Speed
+Speed ::= INTEGER (0..8191) -- Units of 0.02 m/s
+   -- The value 8191 indicates that
+   -- speed is unavailable
+
+-- SpeedConfidence
+SpeedConfidence ::= ENUMERATED {
+   unavailable (0), -- Not Equipped or unavailable
+   prec100ms   (1), -- 100 meters / sec
+   prec10ms    (2), -- 10 meters / sec
+   prec5ms     (3), -- 5 meters / sec
+   prec1ms     (4), -- 1 meters / sec
+   prec0-1ms   (5), -- 0.1 meters / sec
+   prec0-05ms  (6), -- 0.05 meters / sec
+   prec0-01ms  (7)  -- 0.01 meters / sec
+   }
+
+-- DE_StabilityControlStatus
+StabilityControlStatus ::= ENUMERATED {
+   unavailable (0), -- B'00 Not Equipped with SC
+                    -- or SC status is unavailable
+   off         (1), -- B'01 Off
+   on          (2), -- B'10 On or active (but not engaged)
+   engaged     (3)  -- B'11 stability control is Engaged
+   }
+
+-- DE_SteeringWheelAngle
+SteeringWheelAngle ::= INTEGER (-126..127)
+   -- LSB units of 1.5 degrees, a range of -189 to +189 degrees
+   -- +001 = +1.5 deg
+   -- -126 = -189 deg and beyond
+   -- +126 = +189 deg and beyond
+   -- +127 to be used for unavailable
+
+--DE_TemporaryID
+TemporaryID ::= OCTET STRING (SIZE(4))
+
+-- DE_ThrottleConfidence
+ThrottleConfidence ::= ENUMERATED {
+   unavailable (0), -- B'00 Not Equipped or unavailable
+   prec10percent (1), -- B'01 10 percent Confidence level
+   prec1percent (2), -- B'10 1 percent Confidence level
+   prec0-5percent (3) -- B'11 0.5 percent Confidence level
+   }
+
+--DE_TimeConfidence
+TimeConfidence ::= ENUMERATED {
+   unavailable (0), -- Not Equipped or unavailable
+   time-100-000 (1), -- Better than 100 Seconds
+   time-050-000 (2), -- Better than 50 Seconds
+   time-020-000 (3), -- Better than 20 Seconds
+   time-010-000 (4), -- Better than 10 Seconds
+   time-002-000 (5), -- Better than 2 Seconds
+   time-001-000 (6), -- Better than 1 Second
+   time-000-500 (7), -- Better than 0.5 Seconds
+   time-000-200 (8), -- Better than 0.2 Seconds
+   time-000-100 (9), -- Better than 0.1 Seconds
+   time-000-050 (10), -- Better than 0.05 Seconds
+   time-000-020 (11), -- Better than 0.02 Seconds
+   time-000-010 (12), -- Better than 0.01 Seconds
+   time-000-005 (13), -- Better than 0.005 Seconds
+   time-000-002 (14), -- Better than 0.002 Seconds
+   time-000-001 (15), -- Better than 0.001 Seconds
+                      -- Better than one millisecond
+   time-000-000-5 (16), -- Better than 0.000,5 Seconds
+   time-000-000-2 (17), -- Better than 0.000,2 Seconds
+   time-000-000-1 (18), -- Better than 0.000,1 Seconds
+   time-000-000-05 (19), -- Better than 0.000,05 Seconds
+   time-000-000-02 (20), -- Better than 0.000,02 Seconds
+   time-000-000-01 (21), -- Better than 0.000,01 Seconds
+   time-000-000-005 (22), -- Better than 0.000,005 Seconds
+   time-000-000-002 (23), -- Better than 0.000,002 Seconds
+   time-000-000-001 (24), -- Better than 0.000,001 Seconds
+                          -- Better than one micro second
+   time-000-000-000-5 (25), -- Better than 0.000,000,5 Seconds
+   time-000-000-000-2 (26), -- Better than 0.000,000,2 Seconds
+   time-000-000-000-1 (27), -- Better than 0.000,000,1 Seconds
+   time-000-000-000-05 (28), -- Better than 0.000,000,05 Seconds
+   time-000-000-000-02 (29), -- Better than 0.000,000,02 Seconds
+   time-000-000-000-01 (30), -- Better than 0.000,000,01 Seconds
+   time-000-000-000-005 (31), -- Better than 0.000,000,005 Seconds
+   time-000-000-000-002 (32), -- Better than 0.000,000,002 Seconds
+   time-000-000-000-001 (33), -- Better than 0.000,000,001 Seconds
+                              -- Better than one nano second
+   time-000-000-000-000-5 (34), -- Better than 0.000,000,000,5 Seconds
+   time-000-000-000-000-2 (35), -- Better than 0.000,000,000,2 Seconds
+   time-000-000-000-000-1 (36), -- Better than 0.000,000,000,1 Seconds
+   time-000-000-000-000-05 (37), -- Better than 0.000,000,000,05 Seconds
+   time-000-000-000-000-02 (38), -- Better than 0.000,000,000,02 Seconds
+   time-000-000-000-000-01 (39) -- Better than 0.000,000,000,01 Seconds
+   }
+
+-- DE_TimeOffset
+TimeOffset ::= INTEGER (1..65535)
+   -- LSB units of of 10 mSec,
+   -- with a range of 0.01 seconds to 10 minutes and 55.34 seconds
+   -- a value of 65534 to be used for 655.34 seconds or greater
+   -- a value of 65535 to be unavailable
+
+-- DE_TractionControlStatus
+TractionControlStatus ::= ENUMERATED {
+   unavailable (0), -- B'00 Not Equipped with traction control
+                    -- or traction control status is unavailable
+   off         (1), -- B'01 traction control is Off
+   on          (2), -- B'10 traction control is On (but not Engaged)
+   engaged     (3)  -- B'11 traction control is Engaged
+   }
+
+-- DE_TransmissionState
+TransmissionState ::= ENUMERATED {
+   neutral      (0), -- Neutral
+   park         (1), -- Park
+   forwardGears (2), -- Forward gears
+   reverseGears (3), -- Reverse gears
+   reserved1    (4),
+   reserved2    (5),
+   reserved3    (6),
+   unavailable  (7)  -- not-equipped or unavailable value,
+   -- Any related speed is relative to the vehicle reference frame used
+   }
+
+-- DE_VehicleEventFlags
+VehicleEventFlags ::= BIT STRING {
+   eventHazardLights              (0),
+   eventStopLineViolation         (1), -- Intersection Violation
+   eventABSactivated              (2),
+   eventTractionControlLoss       (3),
+   eventStabilityControlactivated (4),
+   eventHazardousMaterials        (5),
+   eventReserved1                 (6),
+   eventHardBraking               (7),
+   eventLightsChanged             (8),
+   eventWipersChanged             (9),
+   eventFlatTire                 (10),
+   eventDisabledVehicle          (11), -- The DisabledVehicle DF may also be sent
+   eventAirBagDeployment         (12)
+   } (SIZE (13, ...))
+
+-- DE_VehicleSize
+VehicleSize ::= SEQUENCE {
+   width  VehicleWidth,
+   length VehicleLength
+   }
+
+-- DE_VehicleLength
+VehicleLength ::= INTEGER (0.. 4095) -- LSB units of 1 cm with a range of >40 meters
+
+-- DE_VehicleWidth
+VehicleWidth ::= INTEGER (0..1023) -- LSB units are 1 cm with a range of >10 meters
+
+-- DE_Velocity
+Velocity ::= INTEGER (0..8191) -- Units of 0.02 m/s
+   -- The value 8191 indicates that
+   -- velocity is unavailable
+
+-- DE_VerticalAcceleration
+VerticalAcceleration ::= INTEGER (-127..127)
+   -- LSB units of 0.02 G steps over -2.52 to +2.54 G
+   -- The value +127 shall be used for ranges >= 2.54 G
+   -- The value -126 shall be used for ranges <= 2.52 G
+   -- The value -127 shall be used for unavailable
+
+-- DE_VertOffset-B12
+VertOffset-B12 ::= INTEGER (-2048..2047)
+   -- LSB units of of 10 cm
+   -- with a range of +- 204.7 meters vertical
+   -- value 2047 to be used for 2047 or greater
+   -- value -2047 to be used for -2047 or greater
+   -- value -2048 to be unavailable
+
+-- DE_YawRate
+YawRate ::= INTEGER (-32767..32767)
+   -- LSB units of 0.01 degrees per second (signed)
+
+
+END
+

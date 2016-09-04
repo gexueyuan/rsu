@@ -17,6 +17,7 @@
 
 #include "nmea.h"
 #include "cv_rcp.h"
+#include "app_msg_format.h"
 
 #define VAM_ABS(x)                    (x < 0) ? (-x) : x
 
@@ -26,10 +27,9 @@
 #define RCP_TEMP_ID_LEN 4
 #define RCP_MACADR_LEN 8
 
-#define RCP_MSG_ID_BSM   DSRCmsgID_basicSafetyMessage
-#define RCP_MSG_ID_EVAM  DSRCmsgID_emergencyVehicleAlert
-#define RCP_MSG_ID_RSA   DSRCmsgID_roadSideAlert
-#define RCP_MSG_ID_RTCM  DSRCmsgID_rtcmCorrections
+#define RCP_MSG_ID_BSM   DSRCmsgID_basicSafetyMessage_D
+#define RCP_MSG_ID_EVAM  DSRCmsgID_emergencyVehicleAlert_D
+#define RCP_MSG_ID_RSA   DSRCmsgID_roadSideAlert_D
 
 
 #define BSM_BC_MODE_DISABLE 0
@@ -37,18 +37,18 @@
 #define BSM_BC_MODE_FIXED   2
 
 #define VAM_FLAG_RX           (0x0001)
-#define VAM_FLAG_TX_BSM       (0x0002)
+#define VAM_FLAG_TX_BSM       (0x0002)    /* Send bsm flag. */
 #define VAM_FLAG_TX_BSM_ALERT (0x0004)
 #define VAM_FLAG_TX_BSM_PAUSE (0x0008)
 #define VAM_FLAG_TX_EVAM      (0x0010)
-#define VAM_FLAG_GPS_FIXED    (0x0020)
+#define VAM_FLAG_GPS_FIXED    (0x0020)    /* gps captured flag. */
 #define VAM_FLAG_XXX          (0x0040)
 
 /* for test roadside alert */
 #define VAM_FLAG_TX_RSA       (0x0100)
 
-#define VAM_NEIGHBOUR_MAXNUM   (80)  //
-#define VAM_NEIGHBOUR_MAXLIFE  (5)   //unit: second
+#define VAM_NEIGHBOUR_MAXNUM   (80)
+#define VAM_NEIGHBOUR_MAXLIFE  (5000)  /* unit: s. */
 
 
 /* BEGIN: Added by wanglei, 2014/8/1 */
@@ -96,6 +96,7 @@ enum VAM_EVT{
     VAM_EVT_GPS_STATUS,
     VAM_EVT_GSNR_EBD_DETECT, 
 
+    VAM_EVT_BSM_ALARM_UPDATE = 0,    /* Received bsm alarm message. */
     VAM_EVT_RSA_UPDATE, 
     VAM_EVT_EVA_UPDATE, 
     VAM_EVT_MAX
@@ -105,35 +106,110 @@ enum VAM_EVT{
  * definition of struct                                                      *
 *****************************************************************************/
 
-typedef struct _vam_position{
-    float lat;
-    float lon ;
-    float elev;
-    float accu;
-}vam_position_t;
+/* Save all the compiler settings. */
+#pragma pack(push)
 
-typedef float vam_dir_t ;
-typedef float  vam_speed_t ;
-
-typedef struct _vam_acce{
-    float lon;
-    float lat;
-    float vert;
-    float yaw;
-}vam_acce_t;
+/* store data to reduce data size and off the optimization. */
+#pragma pack(1)
 
 
-typedef struct _vam_stastatus{
-    uint8_t pid[RCP_TEMP_ID_LEN];  //temporary ID
-    uint16_t timestamp;
-    vam_position_t  pos ;
-    float  dir;
-    float  speed;
-    vam_acce_t  acce;
-    uint16_t alert_mask;  //bit0-VBD, bit1-EBD;  1-active, 0-cancel; Í¬evamÖÐalert_mask
-    uint32_t time;  /* This location point corresponding time */     
-    uint8_t  cnt;
-}vam_stastatus_t;
+
+/* Vehicle position accuracy structure. */
+typedef struct _vam_pos_accuracy_t
+{
+    /* Radius of semi-major axis of an ellipsoid. Unit: meter. */
+    float        semi_major_accu;
+
+    /* Radius of semi-minor axis of an ellipsoid. Unit: meter. */
+    float        semi_minor_accu;
+
+    /* Angle of semi-major axis of an ellipsoid. Unit: degree. */
+    float semi_major_orientation;
+
+}vam_pos_accuracy_t, * vam_pos_accuracy_t_ptr;
+
+#define VAM_POS_ACCURACY_T_LEN    (sizeof(vam_pos_accuracy_t))
+
+
+/* Vehicle position structure. */
+typedef struct _vam_position_t
+{
+    /* Geographic latitude. Unit: degree. */
+    double  latitude;
+
+    /* Geographic longitude. Unit: degree. */
+    double longitude;
+
+    /* Geographic position above or below the reference ellipsoid. Unit: meter. */
+    float  elevation;
+    
+}vam_position_t, * vam_position_t_ptr;
+
+#define VAM_POSITION_T_LEN    (sizeof(vam_position_t))
+
+
+/* Acceleration set 4 way. */
+typedef struct _vam_acceset_t
+{   
+    /* Along the vehicle longitudinal axis. Unit: m/s^2. */
+    float  longitudinal;
+
+    /* Along the vehicle lateral axis. Unit: m/s^2. */
+    float       lateral;
+
+    /* Alone the vehicle vertical axis. Unit: m/s^2. */
+    float      vertical;
+
+    /* Vehicle's yaw rate. Unit: degrees per second. */
+    float      yaw_rate;
+    
+}vam_acceset_t, * vam_acceset_t_ptr;
+
+#define VAM_ACCESET_T_LEN    (sizeof(vam_acceset_t))
+
+
+/* Vehicle size structure. */
+typedef struct _vam_vehicle_size_t
+{
+    /* Vehicle size unit: m. */
+    float   vec_width;
+    float  vec_length;
+
+}vam_vehicle_size_t, * vam_vehicle_size_t_ptr;
+
+#define VAM_VEHICLE_SIZE_T_LEN    (sizeof(vam_vehicle_size_t))
+
+
+
+
+
+
+
+/* Vehicle status structure. */
+typedef struct _vam_stastatus_t
+{ 
+    uint32_t                     time;  /* This location point corresponding time. */  
+
+    uint8_t      pid[RCP_TEMP_ID_LEN];  /* Product id. */
+    uint16_t                  dsecond;  /* DSRC second. */
+
+    vam_position_t                pos;  /* Vehicle position. */
+    vam_pos_accuracy_t   pos_accuracy;  /* Vehicle position accuracy. */
+
+    uint8_t	       transmission_state;  /* Transmission status. */
+    float                       speed;  /* Driving speed. Unit km/h. */
+    float                         dir;  /* Driving direction. Unit degree. */
+    float	        steer_wheel_angle;  /* Steering wheel angle. Unit degree. */
+    vam_acceset_t            acce_set;  /* Driving acceleration set. */
+    brake_system_status_st brake_stat;  /* Brake system status. */
+    exterior_lights_st exterior_light;  /* Exterior lights status. */
+
+    uint8_t                  vec_type;  /* Vehicle type. */
+    vam_vehicle_size_t       vec_size;  /* Vehicle size. */
+   
+    uint16_t               alert_mask;  /* bit0-VBD, bit1-EBD;  1-active, 0-cancel. */
+    
+} vam_stastatus_t, * vam_stastatus_t_ptr;
 
 typedef struct _vam_sta_node{
     /* !!!DON'T modify it!!! */
@@ -188,8 +264,10 @@ typedef void (*vam_evt_handler)(void *);
 
 
 
-typedef struct _vam_envar{
 
+/* Vam environment structure. */
+typedef struct _vam_envar_t
+{
     /* working_param */
     vam_config_t working_param;
 
@@ -200,23 +278,21 @@ typedef struct _vam_envar{
     uint8_t tx_evam_msg_cnt;
     uint8_t tx_rsa_msg_cnt;
 
-    uint8_t neighbour_cnt;
-
-    vam_stastatus_t local;
+    vam_stastatus_t   local;
+    
+    list_head_t                   sta_free_list;
+    list_head_t                  neighbour_list;
+    uint8_t                       neighbour_cnt;
     vam_sta_node_t remote[VAM_NEIGHBOUR_MAXNUM];
-
-    list_head_t sta_free_list;
-    list_head_t neighbour_list;
 
     vam_evt_handler evt_handler[VAM_EVT_MAX];
 
     /* os related */
-    osal_task_t *task_vam;
+    osal_task_t   *task_vam;
     osal_queue_t *queue_vam;
 
     osal_timer_t *timer_send_bsm;
     osal_timer_t *timer_send_evam;
-    osal_timer_t *timer_bsm_pause;
     osal_timer_t *timer_gps_life;
     osal_timer_t *timer_neighbour_life;
 
@@ -224,10 +300,15 @@ typedef struct _vam_envar{
 
     osal_sem_t *sem_sta;
 
-}vam_envar_t;
+}vam_envar_t, * vam_envar_t_ptr;
+
+#define VAM_ENVAR_T_LEN    (sizeof(vam_envar_t))
 
 
-typedef struct _vam_rsa_evt_info {
+
+typedef struct _vam_rsa_evt_info 
+{
+	uint16_t dsecond;//DSRC second time
     uint16_t rsa_mask;
 	uint8_t	priority;
     heading_slice_t head;
@@ -243,6 +324,9 @@ typedef struct _vam_pos_data{
 
 }vam_pos_data;
 
+
+/* restore all compiler settings in stacks. */
+#pragma pack(pop)
 /*****************************************************************************
  * declaration of global variables and functions                             *
 *****************************************************************************/
@@ -250,9 +334,7 @@ typedef struct _vam_pos_data{
 extern vam_envar_t *p_vam_envar;
 
 void vsm_start_bsm_broadcast(vam_envar_t *p_vam);
-void vsm_stop_bsm_broadcast(vam_envar_t *p_vam);
 void vsm_update_bsm_bcast_timer(vam_envar_t *p_vam);
-void vsm_pause_bsm_broadcast(vam_envar_t *p_vam);
 
 int vam_add_event_queue(vam_envar_t *p_vam, 
                              uint16_t msg_id, 
@@ -289,13 +371,14 @@ int32_t vam_active_alert(uint16_t alert);
 int32_t vam_cancel_alert(uint16_t alert);
 void vam_gsnr_ebd_detected(uint8_t status);
 
+extern int32_t vam_set_local_status(vam_stastatus_t *local);
+
 int32_t vam_get_all_peer_pid(uint8_t pid[][RCP_TEMP_ID_LEN], uint32_t maxitem, uint32_t *actual);
 
 int32_t vam_get_local_status(vam_stastatus_t *local);
 int32_t vam_get_local_current_status(vam_stastatus_t *local);
 
 int32_t vam_get_peer_status(uint8_t *pid, vam_stastatus_t *local);
-int32_t vam_set_peer_cnt(uint8_t *pid, uint8_t cnt);
 int32_t vam_get_peer_current_status(uint8_t *pid, vam_stastatus_t *local);
 
 int vam_rcp_recv(wnet_rxinfo_t *rxinfo, uint8_t *databuf, uint32_t datalen);
@@ -306,6 +389,14 @@ int rcp_parse_msg(vam_envar_t *p_vam,
 int rcp_send_bsm(vam_envar_t *p_vam);
 int rcp_send_evam(vam_envar_t *p_vam);
 int rcp_send_rsa(vam_envar_t *p_vam);
+
+extern void vam_stop_alert(void);
+
+/* return 1-gps is located,  0-gps is lost */
+extern uint8_t vam_get_gps_status(void);
+
+
+
 
 #endif /* __CV_VAM_H__ */
 

@@ -51,6 +51,9 @@ void * wnet_tx_thread_entry(void *parameter)
 	}
 }
 
+
+uint8_t RxDataBuffer[WNET_MQ_MSG_SIZE] = { 0 };
+
 void * wnet_rx_thread_entry(void *parameter)
 {
     int err;
@@ -90,8 +93,8 @@ void timer_stat_callback(void* parameter)
 
 void wnet_init(void)
 {
-    int i;
-    
+    int ret;
+    ret = 0;
     wnet_envar_t *p_wnet;
     p_wnet_envar = &p_cms_envar->wnet;
     p_wnet = p_wnet_envar;
@@ -111,8 +114,12 @@ void wnet_init(void)
     }
 #endif
 
-    drv_vnet_init(p_wnet);
-
+    ret = drv_vnet_init(p_wnet);
+    if(ret < 0)
+    {
+    	osal_printf("drv_vnet_init error:%d\n",ret);
+    	return;
+    }
     /* os object for wnet */
 #if 0
     p_wnet->queue_frame_rx = osal_queue_create("vnet_frame_rx", WNET_QUEUE_SIZE, WNET_MQ_MSG_SIZE);

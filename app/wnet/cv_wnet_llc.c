@@ -14,7 +14,7 @@
 #define OSAL_MODULE_DEBUG_LEVEL OSAL_DEBUG_INFO
 #define MODULE_NAME "llc"
 #include "cv_osal_dbg.h"
-
+#include "J2735.h"
 #include "cv_vam.h"
 #include "cv_cms_def.h"
 #include "cv_wnet.h"
@@ -53,7 +53,7 @@ int llc_send(wnet_envar_t *p_wnet, wnet_txinfo_t *txinfo, uint8_t *pdata, uint32
                            txinfo->protocol);
         return -1;
     }
-
+    
     return fp_send(p_wnet, txinfo, pdata, length);
 }
 

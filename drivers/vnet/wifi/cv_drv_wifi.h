@@ -72,14 +72,17 @@ extern drv_wifi_envar_t g_wifi_envar;
 
 int drv_vnet_init(wnet_envar_t *p_wnet);
 int drv_vnet_deinit(void);
-int drv_vnet_send(wnet_txinfo_t *txinfo, uint8_t *pdata, int32_t length);
-int drv_vnet_recv(wnet_rxinfo_t *rxinfo, uint8_t *pdata, int32_t *length);
+int drv_vnet_send(wnet_txinfo_t *txinfo, uint8_t *pdata, uint32_t length);
+int drv_vnet_recv(wnet_rxinfo_t *rxinfo, uint8_t *pdata, uint32_t *length);
 int drv_vnet_mac_header_len(void);
 
 
 int nl80211_init(struct nl80211_state *state);
-int drv_wifi_dev_config();
+int nl80211_send_monitor(drv_wifi_envar_t *drv, const void *data, size_t len, int encrypt, int noack);
+void nl80211_cleanup(struct nl80211_state *state);
+int drv_wifi_dev_config(drv_wifi_envar_t *drv);
 int drv_wifi_create_monitor_socket(drv_wifi_envar_t *drv);
+
 
 int mac_addr_a2n(unsigned char *mac_addr, char *arg);
 void mac_addr_n2a(char *mac_addr, unsigned char *arg);

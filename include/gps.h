@@ -2,6 +2,7 @@
 #define	__GPS_H__
 #include <stdint.h>
 #include "nmea.h"
+#include "osal_cmn.h"
 
 #define GPS_DEVICE_NAME	"/dev/ttymxc4"
 

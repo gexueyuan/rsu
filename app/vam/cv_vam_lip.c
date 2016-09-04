@@ -74,8 +74,8 @@ void lip_update_local(t_nmea_rmc *p_rmc, float *p_accu)
         if(!getGps)
         {
             p_vam->local.time = now;
-            p_vam->local.pos.lat = RAD(p_rmc->latitude);
-            p_vam->local.pos.lon = RAD(p_rmc->longitude);
+            p_vam->local.pos.latitude = RAD(p_rmc->latitude);
+            p_vam->local.pos.longitude = RAD(p_rmc->longitude);
             /* 解决停车speed<=3 heading=0的问题, 使用>5km/h的heading */
             if((p_rmc->speed >= 5.0f) && (p_rmc->heading <= 360.0f))
             {
@@ -86,8 +86,8 @@ void lip_update_local(t_nmea_rmc *p_rmc, float *p_accu)
         else if(res)
         {
             p_vam->local.time = now;
-            p_vam->local.pos.lat = RAD(p_rmc->latitude);
-            p_vam->local.pos.lon = RAD(p_rmc->longitude);
+            p_vam->local.pos.latitude = RAD(p_rmc->latitude);
+            p_vam->local.pos.longitude = RAD(p_rmc->longitude);
             /* 解决停车speed<=3 heading=0的问题, 使用>5km/h的heading */
             if((p_rmc->speed >= 5.0f) && (p_rmc->heading <= 360.0f))
             {
@@ -130,14 +130,14 @@ void lip_update_local(t_nmea_rmc *p_rmc, float *p_accu)
     }
 
     if (p_accu){
-        p_vam->local.pos.accu = *p_accu;
+        p_vam->local.pos_accuracy.semi_major_accu = *p_accu;
     }
 }
 
 void lip_update_local_acc(float x, float y, float z)
 {
     vam_stastatus_t *p_local = &(p_vam_envar->local);
-    p_local->acce.lon = x;   /* longitudinal axis: vehicle ahead */
-    p_local->acce.lat = y;   /* lateral axis */
-    p_local->acce.vert = z;  /* vertical axis */
+    p_local->acce_set.longitudinal = x;   /* longitudinal axis: vehicle ahead */
+    p_local->acce_set.lateral = y;   /* lateral axis */
+    p_local->acce_set.vertical = z;  /* vertical axis */
 }

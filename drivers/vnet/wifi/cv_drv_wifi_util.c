@@ -5,7 +5,7 @@
 
 void monitor_buf_print(uint8_t *pbuf , uint32_t len)
 {
-    uint32_t i , j=0 ,k;
+    uint32_t i , j=0 ;
 
     printf("================================================");
     for(i = 0 ; i < len ; i++) {

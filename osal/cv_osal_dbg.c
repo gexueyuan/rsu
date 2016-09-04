@@ -26,7 +26,7 @@ void cv_debug_print_timestamp(void)
 	printf("(%ld.%06u): ", (long) tv.sec, (unsigned int) tv.usec);
 }
 
-void cv_debug_open_syslog()
+void cv_debug_open_syslog(void)
 {
 	openlog("cv_rsu", LOG_PID | LOG_NDELAY, LOG_USER);
 	cv_debug_syslog++;
@@ -64,7 +64,9 @@ void osal_printf(const char * fmt, ...)
     cv_debug_print_timestamp();
 	vprintf(fmt, ap);
 
-	va_end(ap);   
+	va_end(ap);  
+		
+	fflush(stdout); 
 }
 
 void osal_syslog(int level, const char *fmt, ...)
@@ -86,7 +88,7 @@ void osal_printf_unbuf(const char * fmt, ...)
     
     va_start(args, fmt);
     memset(buffer, 0, sizeof(buffer));
-    vsprintf(buffer, fmt, args);
+    vsprintf((char *)buffer, fmt, args);
     va_end(args);
 	cv_debug_print_timestamp();   
 	(void)fprintf(stderr, "%s", buffer);
@@ -109,13 +111,8 @@ OSAL_DEBUG_ENTRY_DECLARE(wnet)
 // add your module here...
 
 const debug_entry_t debug_entry_table_end = {NULL, NULL};
-/**
- *  [block end]
- */
 
-/* BEGIN: Added by wanglei, 2015/5/12 */
-int g_dbg_print_type = 0;
-/* END:   Added by wanglei, 2015/5/12 */
+int g_dbg_print_type = 1;
 
 
 /*****************************************************************************
@@ -163,7 +160,7 @@ void osal_dbg_dump_data(uint8_t *p, uint32_t len)
 
 void dbg_buf_print(uint8_t *pbuf , uint32_t len)
 {
-    uint32_t i , j=0 ,k;
+    uint32_t i , j=0;
 
     printf("=================================================");
     for(i = 0 ; i < len ; i++) {

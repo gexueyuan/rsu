@@ -14,6 +14,8 @@
 #include "cv_drv_wifi.h"
 #include "radiotap_iter.h"
 
+#include "cv_cms_def.h"
+
 extern uint8_t zero_macaddr[6];
 static uint8_t BroadcastAddr[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 static uint8_t BssidForV2V[] = {0x00, 0x63, 0x73, 0x76, 0x32, 0x76};
@@ -36,15 +38,18 @@ int drv_vnet_mac_header_len(void)
     return  IEEE80211_HDRLEN + sizeof(BeaconFixedElement);
 }
 
-int drv_vnet_send(wnet_txinfo_t *txinfo, uint8_t *pdata, int32_t length)
+int drv_vnet_send(wnet_txinfo_t *txinfo, uint8_t *pdata, uint32_t length)
 {
     struct ieee80211_hdr *p_hdr_80211;
     uint8_t *pPayload;
+    uint32_t timestamp;
     drv_wifi_envar_t *p_wifi = &g_wifi_envar;
 
     pPayload = pdata - MAC_BEACON_FIX_LENGTH;
     
     /* fill the beacon fixed element */
+    timestamp = cv_ntohll(txinfo->timestamp);
+    memcpy(BeaconFixedElement, &timestamp, sizeof(txinfo->timestamp));
     memcpy(pPayload, BeaconFixedElement, MAC_BEACON_FIX_LENGTH);
 
     /* fill the 802.11 header */
@@ -60,27 +65,28 @@ int drv_vnet_send(wnet_txinfo_t *txinfo, uint8_t *pdata, int32_t length)
 
     if (p_wifi->monitor_sock) {
         return nl80211_send_monitor(p_wifi, (uint8_t *)p_hdr_80211, 
-                             length+MAC_BEACON_FIX_LENGTH+IEEE80211_HDRLEN, 1);
+                             length+MAC_BEACON_FIX_LENGTH+IEEE80211_HDRLEN, 1, 0);
     }
     else {
         return -1;
     }
 }
 
-int drv_vnet_recv(wnet_rxinfo_t *rxinfo, uint8_t *pdata, int32_t *length)
+int drv_vnet_recv(wnet_rxinfo_t *rxinfo, uint8_t *pdata, uint32_t *length)
 {
     drv_wifi_envar_t *p_wifi = &g_wifi_envar;
-	unsigned char buf[2048];
+	unsigned char buf[WNET_MQ_MSG_SIZE] = { 0 };
     int len;
-	int datarate = 0, ssi_signal = 0;
+//	int datarate = 0, ssi_signal = 0;
 	struct ieee80211_radiotap_iterator iter;
     int radiotap_len = 0;
     struct ieee80211_hdr *hdr;
     int hdr_len = sizeof(struct ieee80211_hdr);
     while (1){
+        
     	len = recv(p_wifi->monitor_sock, buf, sizeof(buf), 0);
-    	if (len < 0) {
-    		printf("nl80211: Monitor socket recv failed: %s\r\n",
+    	if (len <= 0) {
+    		osal_printf("nl80211: Monitor socket recv failed: %s\r\n",
     			   strerror(errno));
     		return -1;
     	}
@@ -123,11 +129,24 @@ int drv_vnet_recv(wnet_rxinfo_t *rxinfo, uint8_t *pdata, int32_t *length)
                 pPayload -= 2;
                 *length -= SKIP_LEN;
             }
-
-            memcpy(pdata, pPayload, *length);
-            memcpy(rxinfo->src.mac.addr, hdr->addr2, MACADDR_LENGTH);
-            
-            return 0;
+            if(*length <= WNET_MQ_MSG_SIZE)
+            {
+                
+                memcpy(pdata, pPayload, *length);
+                memcpy(rxinfo->src.mac.addr, hdr->addr2, MACADDR_LENGTH);
+//                osal_printf("len6 = %d\n",*length);
+                return 0;
+	        }
+            else
+            {
+                osal_printf("nl80211: Received data overflowed for current buffer size len:%d.\n",ElementLen);
+                return -1;
+            }
+        }
+        else
+        {
+            //monitor_buf_print(hdr, len); 
+        	return -1;
         }
     }
 
@@ -153,13 +172,14 @@ int drv_vnet_init(wnet_envar_t *p_wnet)
     
     /* creater monitor socket to receive frame */
     drv_wifi_create_monitor_socket(p_wifi);
-    
+    return 0;
 }
 
-int drv_vnet_deinit(  )
+int drv_vnet_deinit(void)
 {
     drv_wifi_envar_t *p_wifi = &g_wifi_envar;
     p_wifi->dev_ifidx = -1;
     nl80211_cleanup(&p_wifi->nl_state);    
+    return 0;
 }
 

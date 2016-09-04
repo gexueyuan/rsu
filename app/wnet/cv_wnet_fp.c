@@ -76,14 +76,13 @@ int fp_send(wnet_envar_t *p_wnet, wnet_txinfo_t *txinfo, uint8_t *pdata, uint32_
 {
     int ret = 0;
     ret = drv_vnet_send(txinfo, pdata, length);
-    if (ret < 0) {
+    if (ret < 0) 
+    {
         osal_printf("drv send failed\r\n");
-        wnet_release_txbuf(WNET_TXBUF_PTR(txinfo));
         return -1;
     }
     
-    wnet_release_txbuf(WNET_TXBUF_PTR(txinfo));
-    return 0;
+	return 0;
 }
 
 
@@ -92,21 +91,40 @@ int fp_send(wnet_envar_t *p_wnet, wnet_txinfo_t *txinfo, uint8_t *pdata, uint32_
  */
 int fp_recv(wnet_envar_t *p_wnet, wnet_rxinfo_t *rxinfo, uint8_t *pdata, uint32_t length)
 {
-    wnet_rxbuf_t *rxbuf;
+    wnet_rxbuf_t rxbuf;
 
-    rxbuf = wnet_get_rxbuf();
-    if (!rxbuf){
-        OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_WARN, "failed to get rxbuf\n");
+
+    /* Examine the data length. */
+    if(RXBUF_LENGTH < length)
+    {
+        OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_WARN, "Frame data larger than rxbuf size.\n");
         return -1;
     }
 
-    memcpy(&rxbuf->info, rxinfo, sizeof(wnet_rxinfo_t));
-    memcpy(rxbuf->buffer, pdata, length);
-    rxbuf->data_ptr = rxbuf->buffer;
-    rxbuf->data_len = length;
+//    rxbuf = (wnet_rxbuf_t *)malloc(sizeof(wnet_rxbuf_t));
+//    if(rxbuf != NULL)
+//    {
+        /* Empty the reiceved buffer. */	
+        memset(&rxbuf, 0, sizeof(wnet_rxbuf_t));
 
-    llc_recv(p_wnet, rxinfo, rxbuf->data_ptr, rxbuf->data_len);
-    return 0;
+        /* Reconfig the received buffer.  */
+        memcpy(&rxbuf.info, rxinfo, sizeof(wnet_rxinfo_t));
+        memcpy(rxbuf.buffer, pdata, length);
+        rxbuf.data_ptr = rxbuf.buffer;
+        rxbuf.data_len = length;
+
+        llc_recv(p_wnet, rxinfo, rxbuf.data_ptr, rxbuf.data_len);
+	
+        /* Free the received buffer. */
+//        free(rxbuf);
+
+        return 0;
+//    }
+//    else
+//    {
+//        OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_ERROR, "Failed to get rxbuf\n");
+//        return -1;
+//    }
 }
 
 wnet_txbuf_t *wnet_get_txbuf(void)
@@ -119,15 +137,6 @@ wnet_txbuf_t *wnet_get_txbuf(void)
     return txbuf;   
 }
 
-wnet_rxbuf_t *wnet_get_rxbuf(void)
-{
-    wnet_rxbuf_t *rxbuf = NULL;
-    rxbuf = (wnet_rxbuf_t *)malloc(sizeof(wnet_rxbuf_t));
-    memset(rxbuf, 0, sizeof(wnet_rxbuf_t));
-    rxbuf->data_ptr = rxbuf->buffer;
-    rxbuf->data_len = 0;
-    return rxbuf;   
-}
 
 void wnet_release_txbuf(wnet_txbuf_t *txbuf)
 {
@@ -165,7 +174,6 @@ int wnet_recv(wnet_rxinfo_t *rxinfo, uint8_t *pdata, uint32_t length)
         wnet_dbg_rx_fresh++;
         wnet_dbg_rx_actual++;
     }
-    //osal_printf_unbuf("."); /* Indicate RX is in process, for debug only */
 
     return fp_recv(p_wnet_envar, rxinfo, pdata, length);
 }

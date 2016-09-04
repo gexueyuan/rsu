@@ -36,6 +36,9 @@
 
 typedef struct _frame_control {
 #ifndef __LITTLE_ENDIAN
+    u16 SubType:4;    /* MSDU subtype */
+    u16 Type:2;        /* MSDU type */
+    u16 Ver:2;        /* Protocol version */
     u16 Order:1;        /* Strict order expected */
     u16 Wep:1;        /* Wep data */
     u16 MoreData:1;    /* More data bit */
@@ -43,10 +46,7 @@ typedef struct _frame_control {
     u16 Retry:1;        /* Retry status bit */
     u16 MoreFrag:1;    /* More fragment bit */
     u16 FrDs:1;        /* From DS indication */
-    u16 ToDs:1;        /* To DS indication */
-    u16 SubType:4;    /* MSDU subtype */
-    u16 Type:2;        /* MSDU type */
-    u16 Ver:2;        /* Protocol version */
+    u16 ToDs:1;        /* To DS indication */  
 #else
     u16 Ver:2;        /* Protocol version */
     u16 Type:2;        /* MSDU type */
