@@ -96,7 +96,7 @@ enum VAM_EVT{
     VAM_EVT_GPS_STATUS,
     VAM_EVT_GSNR_EBD_DETECT, 
 
-    VAM_EVT_BSM_ALARM_UPDATE = 0,    /* Received bsm alarm message. */
+    VAM_EVT_BSM_ALARM_UPDATE,    /* Received bsm alarm message. */
     VAM_EVT_RSA_UPDATE, 
     VAM_EVT_EVA_UPDATE, 
     VAM_EVT_MAX

@@ -22,10 +22,10 @@
 #include "ieee80211.h"
 
 #include "cv_drv_wifi.h"
-
+#include "error.h"
 int iw_debug = 0;
 #define MAX_TXPOWER_MBM  (30*100)
-
+#define NODE_ID_BASE_ETH	"wlan0"
 /*
  * we post-process the filter code later and rewrite
  * this to the offset to the last instruction
@@ -587,25 +587,29 @@ int drv_wifi_set_interface_flag(char *ifname, short flag)
 /* get wifi local macaddr. none '\0' */
 int drv_wifi_get_macaddr(uint8_t * mac)
 {
-    struct ifreq ifreq;
-    int sock;
+    int fd;
+    int ret = 0;
+    struct ifreq ifr;
+    //char *interface = "eth0";
 
-    if ((sock = socket (AF_INET, SOCK_STREAM, 0)) < 0)
-    {
-        perror ("socket");
-        return -1;
+    memset(&ifr, 0, sizeof(ifr));
+    fd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
+    if (fd == -ERR_SYS) {
+        return fd;
     }
-    strcpy (ifreq.ifr_name, IF_NAME);
-
-    if (ioctl (sock, SIOCGIFHWADDR, &ifreq) < 0)
-    {
-        perror ("ioctl");
-        return -1;
+    ifr.ifr_addr.sa_family = AF_INET;
+    strncpy(ifr.ifr_name, NODE_ID_BASE_ETH, IFNAMSIZ);        //ÅäÖÃ½Ó¿ÚÊôÐÔ
+    if (mac) {
+        if (ioctl(fd, SIOCGIFHWADDR, &ifr) != 0) {
+            close(fd);
+            return -ERR_SYS;
+        }
+        memcpy(mac, ifr.ifr_hwaddr.sa_data, 6);
     }
-    memcpy(mac, ifreq.ifr_hwaddr.sa_data, MACADDR_LENGTH);
-    
-    return 0;
+    close(fd);
+    return ret;
 }
+
 
 /* iw dev wlan0  
   1. set type monitor

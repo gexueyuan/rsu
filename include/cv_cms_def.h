@@ -49,7 +49,7 @@
     size of all the queue in system 
 */
 #define SYS_QUEUE_SIZE 16
-#define VAM_QUEUE_SIZE 20
+#define VAM_QUEUE_SIZE 99
 #define VSA_QUEUE_SIZE 16
 #define WNET_QUEUE_SIZE 20
 

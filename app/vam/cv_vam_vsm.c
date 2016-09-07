@@ -56,7 +56,7 @@ void vsm_start_bsm_broadcast(vam_envar_t *p_vam)
 {
     uint16_t period = 0;
 
-
+    uint8_t ret;
     /* Calcute bsm send peroid. */
     if(p_vam->working_param.bsm_boardcast_mode == BSM_BC_MODE_AUTO)
     {
@@ -69,8 +69,16 @@ void vsm_start_bsm_broadcast(vam_envar_t *p_vam)
  
     p_vam->bsm_send_period_ticks = MS_TO_TICK(period);
 
-    osal_timer_change(p_vam->timer_send_bsm, p_vam->bsm_send_period_ticks);
-    osal_timer_start(p_vam->timer_send_bsm);
+    ret = osal_timer_change(p_vam->timer_send_bsm, p_vam->bsm_send_period_ticks);
+
+    if(ret < 0 )
+            OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_WARN, "\nchange timer failed,ret is %d \n",__FUNCTION__,ret);
+
+    ret = osal_timer_start(p_vam->timer_send_bsm);
+    if(ret < 0 )
+            OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_WARN, "\nstart timer failed,ret is %d \n",__FUNCTION__,ret);
+        
+    
 }
 
 void vsm_stop_bsm_broadcast(vam_envar_t *p_vam)
@@ -171,9 +179,11 @@ void timer_gps_life_callback(void* parameter)
     if (p_vam->flag & VAM_FLAG_GPS_FIXED){
         p_vam->flag &= ~VAM_FLAG_GPS_FIXED;
         OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_WARN, "gps is lost!\n");
+        /*
         if (p_vam->evt_handler[VAM_EVT_GPS_STATUS]){
             (p_vam->evt_handler[VAM_EVT_GPS_STATUS])((void *)0);
         }
+        */
     }
 }
 

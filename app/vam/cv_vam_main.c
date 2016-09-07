@@ -69,14 +69,14 @@ void vam_main_proc(vam_envar_t *p_vam, sys_msg_t *p_msg)
             if(p_vam->timer_send_bsm != NULL)
             {
                 osal_timer_stop(p_vam->timer_send_bsm);
-                p_vam->timer_send_bsm = NULL;
+                //p_vam->timer_send_bsm = NULL;
             }
 
             /* Stop neighbour life timer. */
             if(p_vam->timer_neighbour_life)
             {
                 osal_timer_stop(p_vam->timer_neighbour_life);
-                p_vam->timer_neighbour_life = NULL;
+                //p_vam->timer_neighbour_life = NULL;
             }
             
             p_vam->flag &= ~(VAM_FLAG_RX | VAM_FLAG_TX_BSM);
@@ -135,6 +135,7 @@ void * vam_thread_entry (void *parameter)
     vam_envar_t *p_vam = (vam_envar_t *)parameter;
     uint32_t len = 0;
     uint8_t buf[VAM_MQ_MSG_SIZE];
+    int i=0;
     OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_INFO, "%s: ---->\n", __FUNCTION__);
 
     p_msg = (sys_msg_t *)buf;
@@ -142,6 +143,9 @@ void * vam_thread_entry (void *parameter)
         memset(buf, 0, VAM_MQ_MSG_SIZE);
         err = osal_queue_recv(p_vam->queue_vam, buf, &len, OSAL_WAITING_FOREVER);
         if (err == OSAL_STATUS_SUCCESS && len > 0){
+            //printf("msg id is %x\n",p_msg->id);
+            //if((p_msg->id == VAM_MSG_GPSDATA)&&((++i)%30 == 0))
+                //printf("get gps package %d\n",i);
             vam_main_proc(p_vam, p_msg);
         }
         else{
@@ -216,7 +220,7 @@ void vam_init(void)
    
     if (0 == memcmp(p_cms_param->pid, zero_pid, RCP_TEMP_ID_LEN)){
         for (i=0; i<RCP_TEMP_ID_LEN; i++){
-            p_vam->local.pid[i] = 0xaa;//des(RCP_TEMP_ID_LEN-1-i);
+            p_vam->local.pid[i] = des(MACADDR_LENGTH-1-i);
         }
     }
     else {
@@ -251,7 +255,7 @@ void vam_init(void)
     osal_assert(p_vam->timer_send_evam != NULL);
 
     p_vam->timer_gps_life = osal_timer_create("tm-gl",timer_gps_life_callback,p_vam,\
-        BSM_GPS_LIFE_DEFAULT, TIMER_INTERVAL|TIMER_STOPPED, TIMER_PRIO_NORMAL); 					
+        BSM_GPS_LIFE_DEFAULT, TIMER_ONESHOT|TIMER_STOPPED, TIMER_PRIO_NORMAL); 					
     osal_assert(p_vam->timer_gps_life != NULL);
 
     p_vam->timer_neighbour_life = osal_timer_create("tm-nl",timer_neigh_time_callback,p_vam,\

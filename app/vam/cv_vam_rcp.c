@@ -22,7 +22,7 @@
 #include "J2735.h"
 #include "app_msg_format.h"
 
-
+extern  void dump_pos(vam_stastatus_t *p_sta);
 /*****************************************************************************
  * declaration of variables and functions                                    *
 *****************************************************************************/
@@ -283,6 +283,9 @@ int rcp_parse_bsm(vam_envar_t *p_vam, wnet_rxinfo_t *rxinfo, uint8_t *databuf, u
 
         /* for test  */
         if (1 == g_dbg_print_type){
+    
+            //dump_pos(&p_vam->local);
+            //dump_pos(&p_sta->s);
             rcp_dbg_distance = vsm_get_distance(&p_vam->local.pos, &p_sta->s.pos);
             test_node = test_find_sta(p_sta->s.pid);
             test_node->distance_dev = rcp_dbg_distance;

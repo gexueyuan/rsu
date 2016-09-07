@@ -74,7 +74,7 @@ void * wnet_rx_thread_entry(void *parameter)
             wnet_recv(&rxinfo, data, len);
         }
         else{
-            OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_ERROR, "%s:failed to recv frame(%d)\n", \
+           // OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_LOUD, "%s:failed to recv frame(%d)\n", \
                                 __FUNCTION__, err);
         }
 	}

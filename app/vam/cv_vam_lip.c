@@ -74,8 +74,8 @@ void lip_update_local(t_nmea_rmc *p_rmc, float *p_accu)
         if(!getGps)
         {
             p_vam->local.time = now;
-            p_vam->local.pos.latitude = RAD(p_rmc->latitude);
-            p_vam->local.pos.longitude = RAD(p_rmc->longitude);
+            p_vam->local.pos.latitude = p_rmc->latitude;//RAD(p_rmc->latitude);
+            p_vam->local.pos.longitude = p_rmc->longitude;//RAD(p_rmc->longitude);
             /* 解决停车speed<=3 heading=0的问题, 使用>5km/h的heading */
             if((p_rmc->speed >= 5.0f) && (p_rmc->heading <= 360.0f))
             {
@@ -86,8 +86,8 @@ void lip_update_local(t_nmea_rmc *p_rmc, float *p_accu)
         else if(res)
         {
             p_vam->local.time = now;
-            p_vam->local.pos.latitude = RAD(p_rmc->latitude);
-            p_vam->local.pos.longitude = RAD(p_rmc->longitude);
+            p_vam->local.pos.latitude = p_rmc->latitude;//RAD(p_rmc->latitude);
+            p_vam->local.pos.longitude = p_rmc->longitude;//RAD(p_rmc->longitude);
             /* 解决停车speed<=3 heading=0的问题, 使用>5km/h的heading */
             if((p_rmc->speed >= 5.0f) && (p_rmc->heading <= 360.0f))
             {
@@ -115,18 +115,21 @@ void lip_update_local(t_nmea_rmc *p_rmc, float *p_accu)
                     p_rmc->tt.year, p_rmc->tt.mon, p_rmc->tt.day, p_rmc->tt.hour, p_rmc->tt.min,\
                     p_rmc->tt.sec, p_rmc->tt.diffsec);
             gps_to_rtc(&p_rmc->tt);
+            /*
             if (p_vam->evt_handler[VAM_EVT_GPS_STATUS]){
                 (p_vam->evt_handler[VAM_EVT_GPS_STATUS])((void *)1);
-            }
+
+            }                */
         }
 
         /* refresh the timer */
         osal_timer_stop(p_vam->timer_gps_life);
         osal_timer_start(p_vam->timer_gps_life);
-
+/*
         if(p_vam->evt_handler[VAM_EVT_LOCAL_UPDATE]){
             (p_vam->evt_handler[VAM_EVT_LOCAL_UPDATE])(&p_vam->local); 
         }
+    */
     }
 
     if (p_accu){

@@ -254,6 +254,7 @@ int32_t nmea_rmc_lon(char *pStrS, char *pStrE, float *longitude)
     return 0;
 }
 
+float accu = 0.0;
 void nmea_parse(uint8_t *buff, uint32_t len)
 {
     uint8_t crcCk = 0x00;
@@ -264,7 +265,6 @@ void nmea_parse(uint8_t *buff, uint32_t len)
     float longitude = 0.0;
     float speed = 0.0;
     float heading = 0.0;
-    float accu = 0.0;
     char *pStrS = NULL;
     char *pStrE = NULL;
     e_nmea_type CurPackType = GPS_PACK_UNKNOWN;

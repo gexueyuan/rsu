@@ -50,18 +50,24 @@ extern int drv_wifi_get_macaddr(uint8_t * mac);
 static uint8_t device_eletronic_signature[12];
 
 void des_init(void)
-{
-    #define DES_BASE 0x1FFF7A10
+{  
 
-    volatile uint32_t *des_reg = (uint32_t *)DES_BASE;
-    
+	int ret;
+
     volatile uint8_t mac[MACADDR_LENGTH];;// 
     
-    drv_wifi_get_macaddr(mac);
+    ret = drv_wifi_get_macaddr(mac);
+
+    if(ret < 0){
+        
+            osal_printf("net_mac_get error ret= %d",ret);
+    }
     
-    memcpy(&device_eletronic_signature[0], (void *)mac, 4);
-    memcpy(&device_eletronic_signature[4], (void *)(mac+4), 4);
-    memcpy(&device_eletronic_signature[8], (void *)(mac+8), 4);
+    memset(device_eletronic_signature,0,sizeof(device_eletronic_signature));
+    
+    memcpy(device_eletronic_signature, mac, 6);
+
+    
 }
 
 uint8_t des(int offset)
@@ -82,12 +88,12 @@ int main(int argc, char *argv[])
     global_init();
     param_init();
 // 	nmea_init();
+    des_init();
     wnet_init();
     vam_init();
     mda_init();
 //    vsa_init();    
     sys_init();
-
     vam_start();
 //    vsa_start();
     gps_init();

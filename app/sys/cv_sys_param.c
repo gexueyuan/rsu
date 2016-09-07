@@ -206,10 +206,10 @@ void load_default_param(cfg_param_t *param)
     memset(param, 0 , sizeof(cfg_param_t));
 
     /******************ID************************/
-    param->pid[0] = 0xcc;
-    param->pid[1] = 0xcc;    
-    param->pid[2] = 0xcc;
-    param->pid[3] = 0xcc;
+    //param->pid[0] = 0xcc;
+    //param->pid[1] = 0xcc;    
+    //param->pid[2] = 0xcc;
+    //param->pid[3] = 0xcc;
     /******************** VAM *********************/
     param->vam.bsm_hops = 1; 
     param->vam.bsm_boardcast_mode = 2;  /* 0 - disable, 1 - auto, 2 - fixed period */

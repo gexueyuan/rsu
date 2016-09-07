@@ -54,6 +54,7 @@ void gps_set_host_baudrate(int fd, int baud)
 static void gps_read_data(int dev)
 {
 	uint8_t tmp = 0 ;
+    int i = 0;
 	while(1){
 		if(os_device_read(dev, &tmp, 1) == 1){
 
@@ -80,10 +81,13 @@ static void gps_read_data(int dev)
                                     p_msg->id = VAM_MSG_GPSDATA;
                                     p_msg->len = __GPSBuff.PpBuf[__GPSBuff.Pipe].Len;
                                     p_msg->argv = &__GPSBuff.PpBuf[__GPSBuff.Pipe].Buf;
+                                    //if((++i)%30 == 0)
+                                    //printf("send gps package is %d\n",i);
                                     if (OSAL_STATUS_SUCCESS != vam_add_event_queue_2(&p_cms_envar->vam, p_msg, sizeof(sys_msg_t))){
                                         osal_printf("gps drv send msg to vam lip failed.");
+                                        
+                                        osal_free(p_msg);
                                     }
-                                    osal_free(p_msg);
                                 }
                             }
                         }
