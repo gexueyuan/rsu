@@ -65,21 +65,19 @@ void * wnet_rx_thread_entry(void *parameter)
     wnet_rxinfo_t rxinfo;
     
 	while(1){
-	    memset(data, 0, WNET_MQ_MSG_SIZE);
-        memset(&rxinfo, 0, sizeof(wnet_rxinfo_t));
-        
-	    err = drv_vnet_recv(&rxinfo, data, &len);
-        if (err == OSAL_STATUS_SUCCESS && len > 0){
-            //dbg_buf_print(data, len);
-            wnet_recv(&rxinfo, data, len);
-        }
-        else{
-           // OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_LOUD, "%s:failed to recv frame(%d)\n", \
-                                __FUNCTION__, err);
-        }
-	}
-}
 
+        memset(RxDataBuffer, 0, WNET_MQ_MSG_SIZE);
+        memset(&rxinfo, 0, sizeof(wnet_rxinfo_t));
+
+        err = drv_vnet_recv(&rxinfo, RxDataBuffer, &len);
+        if (err == OSAL_STATUS_SUCCESS && len > 0){
+        	wnet_recv(&rxinfo, RxDataBuffer, len);
+        }else{
+        	//OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_ERROR, "%s:failed to recv frame(err = %d,len = %d)\n", __FUNCTION__, err,len);
+        }
+
+}
+}
 extern void test_comm(void);
 extern int cv_drv_wifi_init( );
 
