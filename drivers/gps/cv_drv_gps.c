@@ -118,7 +118,7 @@ void * rt_gps_thread_entry (void *parameter)
     
 	/*  打开串口 */
 	gps_fd = os_device_open(GPS_DEVICE_NAME);
-
+/*
 	if (gps_fd > 0){
         uart_set_speed(gps_fd, 9600); //设置波特率
 	}
@@ -132,7 +132,7 @@ void * rt_gps_thread_entry (void *parameter)
     	printf("Set Parity Error\n");
     	exit(1);
   	}
-
+*/
     gps_chip_config(gps_fd, 5);
 	
 	while(1){

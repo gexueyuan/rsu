@@ -66,8 +66,9 @@ void lip_update_local(t_nmea_rmc *p_rmc, float *p_accu)
     vam_stastatus_t last;
     vam_stastatus_t current;
     uint32_t now;
+    int ret;
+    uint32_t freshtime;
     memcpy(&last, &p_vam->local, sizeof(last));
-
     if (p_rmc){   
         now = osal_get_systemtime();
         res = lip_rmc_valid_check(p_rmc, now);
@@ -121,10 +122,20 @@ void lip_update_local(t_nmea_rmc *p_rmc, float *p_accu)
 
             }                */
         }
-
+        //printf("refresh time is %d\n",osal_get_systemtime()/1000);
         /* refresh the timer */
-        osal_timer_stop(p_vam->timer_gps_life);
-        osal_timer_start(p_vam->timer_gps_life);
+        ret = osal_timer_stop(p_vam->timer_gps_life);
+        if(ret != OSAL_STATUS_SUCCESS){
+
+            OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_INFO, "gps timer stop failed\n");
+        }
+        
+        ret = osal_timer_start(p_vam->timer_gps_life);
+
+        if(ret != OSAL_STATUS_SUCCESS){
+
+            OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_INFO, "gps timer stop failed\n");
+        }
 /*
         if(p_vam->evt_handler[VAM_EVT_LOCAL_UPDATE]){
             (p_vam->evt_handler[VAM_EVT_LOCAL_UPDATE])(&p_vam->local); 

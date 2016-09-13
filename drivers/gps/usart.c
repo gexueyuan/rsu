@@ -22,6 +22,7 @@
 #include <semaphore.h>
 #include <time.h>
 #include "cv_osal.h"
+#include "serial.c"
 
 #ifndef OK
 #define OK  0
@@ -195,6 +196,19 @@ int os_device_open(char *dev)
         fcntl(fd, F_SETFL, 0);
         return fd; 
 	}
+    /*
+    
+    struct serial sx;
+    const char *e = SerialInit(&sx, dev, SPABAUD_115200,
+        SPASTOPBITS_1, SPAPROTOCOL_NONE, SPAPARITY_NONE, SPADATABITS_8, 1);
+    if(e)
+    {
+      fprintf(stderr, "%s\n", e);
+      return 20;
+    }
+
+    return sx.Stream;
+*/
 }
 
 /* read from uart */

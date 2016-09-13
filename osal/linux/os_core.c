@@ -11,7 +11,7 @@
 ******************************************************************************/
 
 #include "os_core.h"
- 
+#include "cv_cms_def.h"
 int os_mutex_create(pthread_mutex_t *mutex)
 {
     int ret = 0;
@@ -397,12 +397,27 @@ int os_mq_timedsend(mqd_t qid, void *data, uint32_t msg_len, uint32_t priority, 
 {
     struct timespec ts;
     int    ret;
-
+    struct mq_attr attr;
+    sys_msg_t msg;
     if(data == NULL){
         return -1;
     }
-
+    
+    mq_getattr(qid, &attr);
     os_millisec_2_timespec(timeout, &ts);    
+#if 0
+    if(attr.mq_curmsgs > attr.mq_maxmsg/10){
+        
+
+        msg = *(sys_msg_t *)data;
+
+        printf("new msg  is %x\n",msg.id);
+
+        
+        printf("msg max is %d,num is %d\n",attr.mq_maxmsg,attr.mq_curmsgs);
+
+        }
+    #endif
 #if 0
     while ((ret = mq_timedsend(qid, data, msg_len, priority, &ts)) < 0 && errno == EINTR){
         continue;
@@ -412,7 +427,8 @@ int os_mq_timedsend(mqd_t qid, void *data, uint32_t msg_len, uint32_t priority, 
 #endif
 
     if (ret < 0) {
-        (void) fprintf(stderr, "mq_timedsend(): %s\r\n", strerror(errno));       
+        (void) fprintf(stderr, "mq_timedsend(): %s\r\n", strerror(errno)); 
+        
         return -1;
     } 
     return ret;
