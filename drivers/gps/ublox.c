@@ -159,7 +159,7 @@ void gps_chip_config(int fd, int freq)
     //osal_sleep(10);	
     //ubx_cfg_sbas(fd,0);
     osal_sleep(10);	
-#if 0
+#if 1
     /* conifg ublox gps rate 5Hz */
     ubx_cfg_nmea_freq(fd, freq);
     osal_sleep(10);

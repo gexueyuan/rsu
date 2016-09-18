@@ -22,7 +22,7 @@
 #include <semaphore.h>
 #include <time.h>
 #include "cv_osal.h"
-#include "serial.c"
+//#include "serial.c"
 
 #ifndef OK
 #define OK  0
@@ -32,6 +32,11 @@
 #define ERR -1
 #endif
 
+struct serial
+{
+  struct termios Termios;
+  int            Stream;
+};
 
 
 /*设置串口通信速率*/
@@ -164,7 +169,9 @@ int uart_set_parity(int fd, int databits, int stopbits, int parity)
     if (parity != 'n')
         options.c_iflag |= INPCK;
 
-
+    options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG); /*Input*/
+    options.c_oflag &= ~OPOST; /*Output*/
+    
     options.c_cc[VTIME] = 150;  /* 设置超时 15 seconds (150)*/
     options.c_cc[VMIN] = 0;
 
@@ -182,11 +189,12 @@ int uart_set_parity(int fd, int databits, int stopbits, int parity)
 */
 int os_device_open(char *dev) 
 { 
-#if 1
-	int fd = open(dev, O_RDWR | O_NOCTTY | O_NDELAY);					
-#else
-	int fd = open(dev, O_RDWR);   					
-#endif
+
+    struct termios newtermios;
+
+
+    int fd = open(dev, O_RDWR | O_NOCTTY | O_NONBLOCK);					
+
    
 	if (-1 == fd) {  
 		perror("Can't Open Serial Port:%s\n"); 
@@ -196,19 +204,7 @@ int os_device_open(char *dev)
         fcntl(fd, F_SETFL, 0);
         return fd; 
 	}
-    /*
-    
-    struct serial sx;
-    const char *e = SerialInit(&sx, dev, SPABAUD_115200,
-        SPASTOPBITS_1, SPAPROTOCOL_NONE, SPAPARITY_NONE, SPADATABITS_8, 1);
-    if(e)
-    {
-      fprintf(stderr, "%s\n", e);
-      return 20;
-    }
 
-    return sx.Stream;
-*/
 }
 
 /* read from uart */
