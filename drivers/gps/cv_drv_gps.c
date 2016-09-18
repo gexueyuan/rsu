@@ -83,6 +83,8 @@ static void gps_read_data(int dev)
                                     p_msg->argv = &__GPSBuff.PpBuf[__GPSBuff.Pipe].Buf;
                                     //if((++i)%30 == 0)
                                     //printf("send gps package is %d\n",i);
+                                    
+                                    //printf("gps time is %d\n",osal_get_systemtime()/1000);
                                     if (OSAL_STATUS_SUCCESS != vam_add_event_queue_2(&p_cms_envar->vam, p_msg, sizeof(sys_msg_t))){
                                         osal_printf("gps drv send msg to vam lip failed.");
                                         
