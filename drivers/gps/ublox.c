@@ -164,6 +164,6 @@ void gps_chip_config(int fd, int freq)
     ubx_cfg_nmea_freq(fd, freq);
     osal_sleep(10);
     /* config gps baud to 115200 */
-    ubx_cfg_uart_port(fd);
+    //ubx_cfg_uart_port(fd);
 #endif
 }

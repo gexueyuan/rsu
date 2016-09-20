@@ -122,7 +122,7 @@ void * rt_gps_thread_entry (void *parameter)
 	gps_fd = os_device_open(GPS_DEVICE_NAME);
 
 	if (gps_fd > 0){
-        uart_set_speed(gps_fd, 115200); //设置波特率
+        uart_set_speed(gps_fd, 9600); //设置波特率
 	}
 	else{
 		osal_printf("Can't Open Serial Port!\n");
