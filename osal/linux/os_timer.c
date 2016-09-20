@@ -704,10 +704,7 @@ timer_delref (struct timer_node *timer)
 
 /* Create new per-process timer using CLOCK.  */
 static int
-__timer_create (clock_id, evp, timerid)
-     clockid_t clock_id;
-     struct sigevent *evp;
-     timer_t *timerid;
+__timer_create (clockid_t clock_id,struct sigevent *evp,timer_t *timerid)
 {
   int retval = -1;
   struct timer_node *newtimer = NULL;
@@ -956,11 +953,7 @@ __timer_gettime (timerid, value)
 
 /* Set timer TIMERID to VALUE, returning old value in OVLAUE.  */
 static int
-__timer_settime (timerid, flags, value, ovalue)
-     timer_t timerid;
-     int flags;
-     const struct itimerspec *value;
-     struct itimerspec *ovalue;
+__timer_settime (timer_t timerid, int flags, const struct itimerspec *value, struct itimerspec *ovalue)
 {
   struct timer_node *timer;
   struct thread_node *thread = NULL;

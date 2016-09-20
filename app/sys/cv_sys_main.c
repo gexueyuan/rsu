@@ -44,7 +44,6 @@ extern void sys_init(void);
 extern void mda_init(void);
 cms_global_t cms_envar, *p_cms_envar;
 
-extern void cv_oam_init();
 extern int drv_wifi_get_macaddr(uint8_t * mac);
 
 static uint8_t device_eletronic_signature[12];
@@ -54,7 +53,7 @@ void des_init(void)
 
 	int ret;
 
-    volatile uint8_t mac[MACADDR_LENGTH];;// 
+    uint8_t mac[MACADDR_LENGTH];;// 
     
     ret = drv_wifi_get_macaddr(mac);
 

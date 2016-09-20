@@ -79,7 +79,6 @@ void os_setprocparam(const char * name)
 {
     const char * __name;
     char self_name[TASK_COMM_LEN], self_name_prefixed[TASK_COMM_LEN];
-    struct sched_param sched;
 
     if ((NULL != name) && ('\0' != name[0])) {
         __name = name;

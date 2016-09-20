@@ -135,7 +135,6 @@ void * vam_thread_entry (void *parameter)
     vam_envar_t *p_vam = (vam_envar_t *)parameter;
     uint32_t len = 0;
     uint8_t buf[VAM_MQ_MSG_SIZE];
-    int i=0;
     OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_INFO, "%s: ---->\n", __FUNCTION__);
 
     p_msg = (sys_msg_t *)buf;
@@ -143,13 +142,7 @@ void * vam_thread_entry (void *parameter)
         memset(buf, 0, VAM_MQ_MSG_SIZE);
         err = osal_queue_recv(p_vam->queue_vam, buf, &len, OSAL_WAITING_FOREVER);
         if (err == OSAL_STATUS_SUCCESS && len > 0){
-           // printf("msg id is %x,time is %d\n",p_msg->id,osal_get_systemtime()/1000);
-            //if((p_msg->id == VAM_MSG_GPSDATA))
-                //printf("get gps time is %d\n",osal_get_systemtime()/1000);
-                //printf("get gps package %d\n",i);
-            //printf("start is %d\n\n",osal_get_systemtime()/1000);
             vam_main_proc(p_vam, p_msg);           
-            //printf("end is %d\n\n",osal_get_systemtime()/1000);
         }
         else{
             OSAL_MODULE_DBGPRT(MODULE_NAME, OSAL_DEBUG_ERROR, "%s: osal_queue_recv error [%d]\n",\

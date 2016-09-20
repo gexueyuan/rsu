@@ -190,20 +190,17 @@ int uart_set_parity(int fd, int databits, int stopbits, int parity)
 int os_device_open(char *dev) 
 { 
 
-    struct termios newtermios;
-
-
     int fd = open(dev, O_RDWR | O_NOCTTY | O_NONBLOCK);					
 
-   
-	if (-1 == fd) {  
-		perror("Can't Open Serial Port:%s\n"); 
-		return -1;   
-	}  
-	else {
+
+    if (-1 == fd) {  
+    	perror("Can't Open Serial Port:%s\n"); 
+    	return -1;   
+    }  
+    else {
         fcntl(fd, F_SETFL, 0);
         return fd; 
-	}
+    }
 
 }
 
@@ -220,7 +217,7 @@ int os_device_read(int fd, char *buf, int len)
         }
         if(nread == 0)
         {            
-            fprintf(stderr, "uart read timeout, len=%d\r\n");
+            fprintf(stderr, "uart read timeout!\r\n");
             return ERR;
         }    
     }while(nread < len);
